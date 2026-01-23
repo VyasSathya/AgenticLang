@@ -1,11 +1,12 @@
 {
   "name": "agentic-lang",
-  "version": "0.1.0",
-  "description": "AI-native programming language with uncertainty as a first-class citizen",
+  "version": "0.2.0",
+  "description": "The world's first AI-native programming language with verified confidence, formal verification, and multi-agent primitives. Built for autonomous agents.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "agentic": "./bin/agentic.js"
+    "agentic": "./bin/agentic.js",
+    "agentic-lsp": "./dist/lsp/server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -16,14 +17,32 @@
   },
   "keywords": [
     "programming-language",
-    "transpiler",
     "ai-native",
+    "formal-verification",
+    "multi-agent",
+    "confidence-tracking",
     "property-based-testing",
-    "uncertainty",
-    "typescript"
+    "mutation-testing",
+    "z3-solver",
+    "session-types",
+    "effect-system",
+    "llm",
+    "ai-agents",
+    "autonomous-agents",
+    "typescript-compiler",
+    "transpiler",
+    "verified-code"
   ],
-  "author": "",
+  "author": "Agentic Language Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VyasSathya/AgenticLang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VyasSathya/AgenticLang/issues"
+  },
+  "homepage": "https://github.com/VyasSathya/AgenticLang#readme",
   "dependencies": {
     "chokidar": "^3.6.0",
     "commander": "^12.0.0",
