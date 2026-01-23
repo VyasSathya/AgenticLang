@@ -1,0 +1,46 @@
+{
+  "name": "agentic-lang",
+  "displayName": "Agentic Language Support",
+  "description": "Syntax highlighting and language support for Agentic programming language",
+  "version": "0.1.0",
+  "publisher": "agentic",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "agentic",
+        "aliases": [
+          "Agentic",
+          "agentic"
+        ],
+        "extensions": [
+          ".agentic"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "agentic",
+        "scopeName": "source.agentic",
+        "path": "./syntaxes/agentic.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}

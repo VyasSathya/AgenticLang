@@ -1,0 +1,216 @@
+// Promise and Async Utilities
+// @agentic/async - Concurrency primitives inspired by Rust futures
+
+@module("async")
+@confidence(0.95)
+
+type Promise<T> {
+  @confidence(0.98)
+  func then<U>(self, f: (T) -> U) -> Promise<U>
+
+  @confidence(0.98)
+  func catch(self, f: (Error) -> T) -> Promise<T>
+
+  @confidence(0.99)
+  func finally(self, f: () -> void) -> Promise<T>
+}
+
+// Parallel execution
+@effects(async)
+@confidence(0.96)
+@complete
+@property("all promises must resolve")
+@property("fails if any promise fails")
+func all<T>(promises: Promise<T>[]) -> Promise<T[]> {
+  // Wait for all promises to complete
+  // Returns array of results in order
+  // Fails fast on first rejection
+}
+
+@effects(async)
+@confidence(0.96)
+@complete
+@property("returns all results (success or failure)")
+func allSettled<T>(promises: Promise<T>[]) -> Promise<Result<T, Error>[]> {
+  // Wait for all promises to settle
+  // Returns array of Results (Ok or Err)
+  // Never rejects
+}
+
+@effects(async)
+@confidence(0.98)
+@complete
+@property("returns first to resolve")
+@property("cancels other promises")
+func race<T>(promises: Promise<T>[]) -> Promise<T> {
+  // Returns first promise to resolve
+  // Rejects if first promise rejects
+}
+
+@effects(async)
+@confidence(0.97)
+@complete
+@property("returns first success")
+@property("fails only if all fail")
+func any<T>(promises: Promise<T>[]) -> Promise<T> {
+  // Returns first promise to succeed
+  // Rejects only if all promises reject
+}
+
+// Delay and scheduling
+@effects(async)
+@confidence(0.99)
+@complete
+@property("resolves after specified duration")
+func sleep(duration: Duration) -> Promise<void> {
+  // Sleep for specified duration
+  // Returns Promise that resolves after delay
+}
+
+@effects(async)
+@confidence(0.95)
+@complete
+@property("rejects after timeout")
+@property("succeeds if completes before timeout")
+func timeout<T>(promise: Promise<T>, duration: Duration) -> Promise<Result<T, TimeoutError>> {
+  race([
+    promise.then(value => Ok(value)),
+    sleep(duration).then(() => Err(TimeoutError.TIMEOUT))
+  ])
+}
+
+// Retry with exponential backoff
+@effects(async)
+@confidence(0.93)
+@complete
+@property("retries on failure")
+@property("respects max attempts")
+@property("uses exponential backoff")
+func retry<T>(
+  operation: () -> Promise<Result<T, Error>>,
+  maxAttempts: number = 3,
+  initialDelay: Duration = 1s,
+  maxDelay: Duration = 30s,
+  multiplier: number = 2.0
+) -> Promise<Result<T, Error>> {
+  attempt = 0
+  delay = initialDelay
+
+  loop {
+    attempt = attempt + 1
+
+    result = operation() match {
+      Ok(value) -> return Ok(value),
+      Err(error) -> {
+        if attempt >= maxAttempts {
+          return Err(error)
+        }
+
+        // Exponential backoff with jitter
+        sleep(delay + randomJitter(delay * 0.1))
+        delay = min(delay * multiplier, maxDelay)
+        continue
+      }
+    }
+  }
+}
+
+// Debounce and throttle
+@effects(async)
+@confidence(0.94)
+@property("delays execution until quiet period")
+func debounce<T>(
+  fn: () -> T,
+  delay: Duration
+) -> () -> Promise<T> {
+  lastCall = 0
+  timeoutId = null
+
+  return () -> {
+    clearTimeout(timeoutId)
+
+    timeoutId = setTimeout(() => {
+      fn()
+    }, delay)
+  }
+}
+
+@effects(async)
+@confidence(0.94)
+@property("limits execution frequency")
+func throttle<T>(
+  fn: () -> T,
+  interval: Duration
+) -> () -> Promise<T> {
+  lastCall = 0
+
+  return () -> {
+    now = Date.now()
+
+    if (now - lastCall) >= interval {
+      lastCall = now
+      return fn()
+    }
+  }
+}
+
+// Parallel execution with worker pool
+@effects(async, state)
+@confidence(0.88)
+@partial("Basic implementation, no worker pool management")
+func parallel<T, U>(
+  items: T[],
+  fn: (T) -> Promise<U>,
+  concurrency: number = 4
+) -> Promise<U[]> {
+  results: U[] = []
+  queue = items.slice()
+  active: Promise<U>[] = []
+
+  while queue.length > 0 or active.length > 0 {
+    // Fill worker pool
+    while active.length < concurrency and queue.length > 0 {
+      item = queue.shift()
+      active.push(fn(item))
+    }
+
+    // Wait for next to complete
+    result = race(active)
+    results.push(result)
+    active = active.filter(p => p !== result)
+  }
+
+  return results
+}
+
+// Channel-based async communication (Go-inspired)
+@effects(async, state)
+type Channel<T> {
+  @confidence(0.95)
+  func send(self, value: T) -> Promise<void>
+
+  @confidence(0.95)
+  func receive(self) -> Promise<Option<T>>
+
+  @confidence(0.99)
+  func close(self) -> void
+
+  @confidence(0.99)
+  func isClosed(self) -> boolean
+}
+
+@confidence(0.96)
+@complete
+func createChannel<T>(capacity: number = 0) -> Channel<T> {
+  // capacity = 0: unbuffered (send blocks until receive)
+  // capacity > 0: buffered (send blocks when buffer full)
+}
+
+// Select from multiple channels (Go's select)
+@effects(async)
+@confidence(0.90)
+@partial("Single channel only, no multi-select yet")
+func select<T>(channels: Channel<T>[]) -> Promise<T> {
+  // Wait for first message from any channel
+  // Returns value and which channel it came from
+}

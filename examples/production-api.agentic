@@ -1,0 +1,304 @@
+// Production-Ready REST API Example
+// Demonstrates: error handling, health checks, observability, rate limiting
+
+@module("api")
+
+// User authentication endpoint
+@confidence(0.93)
+@complete
+@needs(database: Database, jwt: JWTService, logger: Logger)
+@effects(database, io, llm_call)
+@property("rejects empty tokens")
+@property("rejects expired tokens")
+@property("validates token signature")
+func authenticate(token: string) -> Result<User, AuthError> {
+  @trace("authentication_start", { tokenLength: token.length })
+
+  if token.isEmpty() {
+    logger.warn("Authentication failed: empty token")
+    return Err(AuthError.MISSING_TOKEN)
+  }
+
+  @retry(maxAttempts: 2, backoff: "exponential")
+  decoded = jwt.decode(token) match {
+    Ok(payload) -> payload,
+    Err(error) -> {
+      @context {
+        what_failed: "JWT decoding",
+        suggestions: ["Check token format", "Verify JWT_SECRET", "Check token expiration"],
+        recovery: { action: "refresh_token", command: "POST /auth/refresh" }
+      }
+      logger.error("JWT decode failed", error)
+      return Err(AuthError.INVALID_TOKEN)
+    }
+  }
+
+  if decoded.exp < now() {
+    logger.warn("Authentication failed: token expired")
+    return Err(AuthError.EXPIRED_TOKEN)
+  }
+
+  @circuit_breaker(threshold: 5, timeout: 30s)
+  user = database.users.find(decoded.userId) match {
+    Ok(Some(u)) -> u,
+    Ok(None) -> return Err(AuthError.USER_NOT_FOUND),
+    Err(e) -> {
+      @context {
+        what_failed: "User lookup",
+        userId: decoded.userId,
+        suggestions: ["Check database connection", "Verify user exists"]
+      }
+      return Err(AuthError.DATABASE_ERROR(e))
+    }
+  }
+
+  logger.info("User ${user.id} authenticated successfully")
+
+  return Ok(user)
+}
+
+// Create new user with validation
+@confidence(0.91)
+@complete
+@needs(database: Database, validator: Validator, logger: Logger)
+@effects(database, io)
+@property("rejects invalid emails")
+@property("rejects weak passwords")
+@property("prevents duplicate users")
+@requires_approval(threshold: "high_risk_signup")
+func createUser(email: string, password: string) -> Result<User, CreateUserError> {
+  // Validate email
+  @confidence(0.95)
+  validEmail = validator.validateEmail(email) match {
+    Ok(e) -> e,
+    Err(e) -> return Err(CreateUserError.INVALID_EMAIL(e))
+  }
+
+  // Validate password strength
+  @confidence(0.93)
+  @property("enforces minimum 8 characters")
+  @property("requires mixed case")
+  @property("requires special character")
+  validator.validatePassword(password) match {
+    Ok(_) -> {},
+    Err(e) -> return Err(CreateUserError.WEAK_PASSWORD(e))
+  }
+
+  // Check for duplicates
+  existing = database.users.findByEmail(email) match {
+    Ok(Some(_)) -> return Err(CreateUserError.EMAIL_ALREADY_EXISTS),
+    Ok(None) -> {},
+    Err(e) -> return Err(CreateUserError.DATABASE_ERROR(e))
+  }
+
+  // Create user with transaction
+  @transaction
+  user = database.users.create({
+    email: validEmail,
+    passwordHash: hash(password),
+    createdAt: now()
+  }) match {
+    Ok(u) -> u,
+    Err(e) -> {
+      @context {
+        what_failed: "User creation",
+        email: validEmail,
+        suggestions: ["Check database constraints", "Verify unique email"]
+      }
+      return Err(CreateUserError.CREATE_FAILED(e))
+    }
+  }
+
+  logger.info("User created: ${user.id}")
+
+  return Ok(user)
+}
+
+// Health check endpoint
+@healthcheck(interval: 30s)
+@confidence(0.96)
+@effects(database, network)
+func checkAPIHealth() -> HealthStatus {
+  checks = [
+    checkDatabaseConnection(),
+    checkRedisConnection(),
+    checkExternalAPIs()
+  ]
+
+  failures = checks.filter(c => c.status == "failed")
+
+  if failures.length == 0 {
+    return HealthStatus.OK
+  } else if failures.length < checks.length {
+    return HealthStatus.DEGRADED {
+      message: "${failures.length} services unhealthy",
+      details: failures
+    }
+  } else {
+    return HealthStatus.FAILED {
+      message: "All services unhealthy",
+      details: failures
+    }
+  }
+}
+
+@recovery(for: checkAPIHealth)
+@confidence(0.84)
+func recoverAPI() -> Result<void, Error> {
+  @escalate_to_human("API health critical, human intervention needed")
+
+  // Attempt reconnections
+  database.reconnect()
+  redis.reconnect()
+
+  return Ok(void)
+}
+
+// Rate limiting
+@rate_limit(
+  window: 1m,
+  maxRequests: 100,
+  perUser: true,
+  action: "reject_with_429"
+)
+@confidence(0.94)
+@effects(database, state)
+func getUser(userId: string, requestingUser: User) -> Result<User, Error> {
+  // Automatically rate-limited
+  // Returns 429 Too Many Requests if limit exceeded
+
+  @cache(ttl: 5m, key: "user:${userId}")
+  user = database.users.find(userId) match {
+    Ok(Some(u)) -> u,
+    Ok(None) -> return Err(Error.USER_NOT_FOUND),
+    Err(e) -> return Err(Error.DATABASE_ERROR(e))
+  }
+
+  return Ok(user)
+}
+
+// List users with pagination
+@confidence(0.92)
+@complete
+@needs(database: Database)
+@effects(database, io)
+@property("respects limit parameter")
+@property("returns empty array when no results")
+@property("handles invalid pagination")
+func listUsers(
+  page: number = 1,
+  limit: number = 20,
+  filter: Option<UserFilter> = None
+) -> Result<PaginatedResponse<User>, Error> {
+  if limit < 1 or limit > 100 {
+    return Err(Error.INVALID_LIMIT)
+  }
+
+  if page < 1 {
+    return Err(Error.INVALID_PAGE)
+  }
+
+  offset = (page - 1) * limit
+
+  query = database.users.select()
+    .limit(limit)
+    .offset(offset)
+
+  if filter {
+    query = query.where("status", "=", filter.status)
+  }
+
+  @circuit_breaker(threshold: 3, timeout: 30s)
+  users = query.execute() match {
+    Ok(u) -> u,
+    Err(e) -> return Err(Error.DATABASE_ERROR(e))
+  }
+
+  total = database.users.count() match {
+    Ok(c) -> c,
+    Err(e) -> return Err(Error.DATABASE_ERROR(e))
+  }
+
+  return Ok(PaginatedResponse {
+    data: users,
+    page: page,
+    limit: limit,
+    total: total,
+    totalPages: ceil(total / limit)
+  })
+}
+
+// Error handling middleware
+@confidence(0.89)
+@effects(io)
+func errorHandler(error: Error, request: Request) -> Response {
+  @trace_error(error, {
+    path: request.path,
+    method: request.method,
+    userId: request.user?.id
+  })
+
+  error match {
+    AuthError.MISSING_TOKEN -> Response {
+      status: 401,
+      body: { error: "Missing authentication token" }
+    },
+    AuthError.EXPIRED_TOKEN -> Response {
+      status: 401,
+      body: { error: "Token expired", action: "refresh_token" }
+    },
+    Error.RATE_LIMIT_EXCEEDED -> Response {
+      status: 429,
+      body: { error: "Too many requests", retryAfter: 60 }
+    },
+    DatabaseError(_) -> Response {
+      status: 503,
+      body: { error: "Service temporarily unavailable" }
+    },
+    _ -> Response {
+      status: 500,
+      body: { error: "Internal server error", requestId: request.id }
+    }
+  }
+}
+
+// Main API server
+@confidence(0.87)
+@effects(network, database, io)
+@observability(
+  tracing: true,
+  metrics: true,
+  logging: true
+)
+func startServer(port: number) -> Result<void, ServerError> {
+  server = createHTTPServer({
+    port: port,
+    routes: [
+      { method: "POST", path: "/auth/login", handler: authenticate },
+      { method: "POST", path: "/users", handler: createUser },
+      { method: "GET", path: "/users/:id", handler: getUser },
+      { method: "GET", path: "/users", handler: listUsers },
+      { method: "GET", path: "/health", handler: checkAPIHealth }
+    ],
+    errorHandler: errorHandler,
+    middleware: [
+      rateLimitMiddleware,
+      authMiddleware,
+      loggingMiddleware
+    ]
+  })
+
+  @healthcheck(interval: 30s)
+  monitorHealth()
+
+  server.listen() match {
+    Ok(_) -> {
+      logger.info("API server started on port ${port}")
+      return Ok(void)
+    },
+    Err(e) -> {
+      logger.error("Failed to start server", e)
+      return Err(ServerError.STARTUP_FAILED(e))
+    }
+  }
+}

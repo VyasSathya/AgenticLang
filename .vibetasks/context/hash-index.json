@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "workspaceId": null,
+  "rootPath": "C:\\Dev\\agentic-lang",
+  "lastFullScan": 1769124918784,
+  "fileCount": 35,
+  "indexableFileCount": 30,
+  "files": {
+    ".gitignore": {
+      "path": ".gitignore",
+      "hash": "83f455d81f0b1afbee3f8bf4726b675c879ccb9e21f0ea79c805109db9195c3b",
+      "size": 114,
+      "lastModified": 1769122405443.896,
+      "language": "gitignore"
+    },
+    "CONTRIBUTING.md": {
+      "path": "CONTRIBUTING.md",
+      "hash": "4d7ecdb0ab9ab9b5c0a7c099bb44f17f998fb3188c6531031572a75a413702bb",
+      "size": 4442,
+      "lastModified": 1769122958392.0017,
+      "language": "markdown"
+    },
+    "FINAL_REPORT.md": {
+      "path": "FINAL_REPORT.md",
+      "hash": "6cc486200bea1d9e61e93b3f2f4b01e08b8424b97807fcac2e8e95d59ad16722",
+      "size": 11261,
+      "lastModified": 1769124365894.2773,
+      "language": "markdown"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "hash": "26e64b6302309568104fe7689e6054587b4014dcfdb6b80e0bcf18c392549dcf",
+      "size": 1117,
+      "lastModified": 1769122963649.2307,
+      "language": null
+    },
+    "package.json": {
+      "path": "package.json",
+      "hash": "4aedcdc8b4e9b3f379c15bf0ee4043374e7b5104753581c9b7821ef4a694a2c8",
+      "size": 1148,
+      "lastModified": 1769122396314.3735,
+      "language": "json"
+    },
+    "PROJECT_COMPLETE.md": {
+      "path": "PROJECT_COMPLETE.md",
+      "hash": "54d92614e673d0501514ba45125246fa610510a27aed09ffab3d41278ecaf2fd",
+      "size": 11930,
+      "lastModified": 1769124161357.8694,
+      "language": "markdown"
+    },
+    "PROJECT_OVERVIEW.md": {
+      "path": "PROJECT_OVERVIEW.md",
+      "hash": "7ffc2bf770eb58bb1b915ae458f5dacac39553c7a400597dff779f9f3cda0845",
+      "size": 7590,
+      "lastModified": 1769123205016.114,
+      "language": "markdown"
+    },
+    "PROJECT_TREE.txt": {
+      "path": "PROJECT_TREE.txt",
+      "hash": "61ac789a52e458b26490766d31065ae17df1bdfba9840cdf24afa935e555690b",
+      "size": 10768,
+      "lastModified": 1769124442473.5425,
+      "language": null
+    },
+    "README.md": {
+      "path": "README.md",
+      "hash": "fc62c4e9255b0f5fc242c1d2f070f706eb7986ec69e8baced2965ef93b6ea969",
+      "size": 5658,
+      "lastModified": 1769122409990.3672,
+      "language": "markdown"
+    },
+    "SUMMARY.md": {
+      "path": "SUMMARY.md",
+      "hash": "ef15017a6011079b045700ec29ab6a852bf4eaa9594941c84de61f522753b9a9",
+      "size": 9977,
+      "lastModified": 1769124254516.7764,
+      "language": "markdown"
+    },
+    "tsconfig.json": {
+      "path": "tsconfig.json",
+      "hash": "f1c00328ca34a3ef079bd352f636d7b2adbef964c975e73479a077b7abc25f1e",
+      "size": 507,
+      "lastModified": 1769122400744.498,
+      "language": "json"
+    },
+    "vitest.config.ts": {
+      "path": "vitest.config.ts",
+      "hash": "f3a73934eb0ad2beaa842a0be1c0b15ca8a4525cf571f6067aca2884f0ec6e45",
+      "size": 375,
+      "lastModified": 1769123114265.54,
+      "language": "typescript"
+    },
+    "vscode-extension/language-configuration.json": {
+      "path": "vscode-extension/language-configuration.json",
+      "hash": "6ce207d94685057036562e062027db7d98cd1e25bb94520c49744409ad732e92",
+      "size": 672,
+      "lastModified": 1769122742276.284,
+      "language": "json"
+    },
+    "vscode-extension/package.json": {
+      "path": "vscode-extension/package.json",
+      "hash": "c3605dcf3d8418b630ed5b7efc0d42f2572e997a9f6f9505aaa2ac7031e23030",
+      "size": 1052,
+      "lastModified": 1769122730015.0244,
+      "language": "json"
+    },
+    "vscode-extension/README.md": {
+      "path": "vscode-extension/README.md",
+      "hash": "db954c1587ee0a7b90cfe55200e248bf2d7a25c5b292d48de4a33c4be70bfe12",
+      "size": 1622,
+      "lastModified": 1769122748568.2332,
+      "language": "markdown"
+    },
+    "vscode-extension/syntaxes/agentic.tmLanguage.json": {
+      "path": "vscode-extension/syntaxes/agentic.tmLanguage.json",
+      "hash": "b9a51396e0d6f30592034b5bd630bfbfc24f3e736725180fd38ed27ad97e9f6e",
+      "size": 3160,
+      "lastModified": 1769122736163.4526,
+      "language": "json"
+    },
+    "tests/parser.test.ts": {
+      "path": "tests/parser.test.ts",
+      "hash": "53300c031f2f5ae4f3fd6da88b4495ece39ffe385bb9b0e402b95b57b3b43a2b",
+      "size": 3247,
+      "lastModified": 1769123149161.4478,
+      "language": "typescript"
+    },
+    "tests/transpiler.test.ts": {
+      "path": "tests/transpiler.test.ts",
+      "hash": "9ba7da91d5221bcc129488cced1f6efe6993497b0c78a61de2c81da17c7c1fe2",
+      "size": 2019,
+      "lastModified": 1769123152030.5679,
+      "language": "typescript"
+    },
+    "src/cli.ts": {
+      "path": "src/cli.ts",
+      "hash": "3af2ac78eedda7f5696d0717f39bec462a015698c0d6a7936fc5431a9e8fdd28",
+      "size": 3650,
+      "lastModified": 1769122596316.9172,
+      "language": "typescript"
+    },
+    "src/index.ts": {
+      "path": "src/index.ts",
+      "hash": "8a4480f2125a5f25adb102d380e97dc599a217e01d9830cf0e512a21a63aa20b",
+      "size": 1623,
+      "lastModified": 1769123259160.827,
+      "language": "typescript"
+    },
+    "src/types.ts": {
+      "path": "src/types.ts",
+      "hash": "dbbee1086dde8996791e249a693a7fcf88c864aa827807464f68f2b0302a293a",
+      "size": 3508,
+      "lastModified": 1769122461193.5195,
+      "language": "typescript"
+    },
+    "src/runtime/index.ts": {
+      "path": "src/runtime/index.ts",
+      "hash": "c488d0920de161caa6aeb5e5e52ad7cd6ecd32dae7f8258b3f38acc8741dfa87",
+      "size": 5181,
+      "lastModified": 1769122591557.6057,
+      "language": "typescript"
+    },
+    "src/property-tests/generator.ts": {
+      "path": "src/property-tests/generator.ts",
+      "hash": "cc42a3e247e6005c3893910a8a0499de1fd002422edc7d5bdc606aa519bc4a20",
+      "size": 4997,
+      "lastModified": 1769122674937.5044,
+      "language": "typescript"
+    },
+    "src/parser/lexer.ts": {
+      "path": "src/parser/lexer.ts",
+      "hash": "0476594d04ff977d0a0a1a8b956a25c4fdcebb725f95931ee267d50d309d497e",
+      "size": 7775,
+      "lastModified": 1769122467170.3584,
+      "language": "typescript"
+    },
+    "src/parser/parser.ts": {
+      "path": "src/parser/parser.ts",
+      "hash": "ea928f282c829d0636d5adea23d1728da5e49e224ab3a4817512f19462d2d201",
+      "size": 10592,
+      "lastModified": 1769123890201.016,
+      "language": "typescript"
+    },
+    "src/generator/typescript-generator.ts": {
+      "path": "src/generator/typescript-generator.ts",
+      "hash": "c12d58c9d226f374fa04eaa176b11cc8011718f25daf5305e075b2a9734a024d",
+      "size": 6165,
+      "lastModified": 1769122586495.9885,
+      "language": "typescript"
+    },
+    "examples/auth.agentic": {
+      "path": "examples/auth.agentic",
+      "hash": "3095310d2262fa7d0c5b850aa0ae8b3e32a9a739909473f5904968fb60e65bd0",
+      "size": 1668,
+      "lastModified": 1769122648188.7034,
+      "language": null
+    },
+    "examples/minimal.agentic": {
+      "path": "examples/minimal.agentic",
+      "hash": "54c0c169600d652b4684654becf1b3b4434b6f7184c2df7549ffa3e223ddd62b",
+      "size": 61,
+      "lastModified": 1769124070866.8235,
+      "language": null
+    },
+    "examples/minimal.ts": {
+      "path": "examples/minimal.ts",
+      "hash": "cf554511993cb545e3f944d2e703a4a9cdd6fe672107ebc0c80b9f0a5bf0a966",
+      "size": 170,
+      "lastModified": 1769124076694.3767,
+      "language": "typescript"
+    },
+    "examples/runtime.ts": {
+      "path": "examples/runtime.ts",
+      "hash": "5d1fc91ec6a563f00d82662d0ae812f7ab5b8d52caac239a2bb22a0919567bfd",
+      "size": 586,
+      "lastModified": 1769124272645.2302,
+      "language": "typescript"
+    },
+    "examples/simple.agentic": {
+      "path": "examples/simple.agentic",
+      "hash": "ad0e7c1cf8b6da0802c53be5950f53ebdc9977d7830b2243b7bbd6beeb109985",
+      "size": 436,
+      "lastModified": 1769122652968.6252,
+      "language": null
+    },
+    "docs/QUICK_START.md": {
+      "path": "docs/QUICK_START.md",
+      "hash": "090baf5b7fe25cc96c4aaf5422b2ce46a9c333646d1f2711d592576dc147f967",
+      "size": 3820,
+      "lastModified": 1769123063641.8894,
+      "language": "markdown"
+    },
+    "docs/RESEARCH.md": {
+      "path": "docs/RESEARCH.md",
+      "hash": "2faad6398c45a90bb8f6bd72f9d5423541a7be7a092a312075338515d7ef1c01",
+      "size": 5274,
+      "lastModified": 1769123067502.9397,
+      "language": "markdown"
+    },
+    "docs/SPECIFICATION.md": {
+      "path": "docs/SPECIFICATION.md",
+      "hash": "5c60227e3347708898b07e164c8ec459ab6c6764f4a80cfb28d73205228114b7",
+      "size": 7170,
+      "lastModified": 1769122889591.2402,
+      "language": "markdown"
+    },
+    "bin/agentic.js": {
+      "path": "bin/agentic.js",
+      "hash": "81eb7eab42f925fa69114cdff9578302a3f819af35ac89dae7272191f334c1a9",
+      "size": 49,
+      "lastModified": 1769122600785.392,
+      "language": "javascript"
+    }
+  }
+}

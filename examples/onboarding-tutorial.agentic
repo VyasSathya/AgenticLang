@@ -1,0 +1,263 @@
+// Agentic Onboarding Tutorial
+// Complete guide for AI agents learning the language
+
+// LESSON 1: Confidence Tracking
+// Always tell humans how confident you are in your code
+@confidence(0.99, "Simple addition, mathematically proven")
+@complete
+func add(a: number, b: number) -> number {
+  return a + b
+}
+
+@confidence(0.75, "Regex might miss edge cases")
+@partial
+func validateEmail(email: string) -> Result<boolean, string> {
+  if email.contains("@") {
+    return Ok(true)
+  }
+  return Err("Invalid email format")
+}
+
+// LESSON 2: Incremental Development
+// Start with @stub, improve to @partial, finish with @complete
+
+@stub
+@needs(database, email_service)
+func sendWelcomeEmail(userId: string) -> Result<boolean, string> {
+  // Not implemented yet - will throw error if called
+}
+
+@partial
+@confidence(0.60, "Only handles happy path")
+func processPayment(amount: number) -> Result<boolean, string> {
+  if amount > 0 {
+    return Ok(true)
+  }
+  return Err("Invalid amount")
+  // TODO: Add actual payment processing
+  // TODO: Handle refunds
+  // TODO: Add fraud detection
+}
+
+@complete
+@confidence(0.95, "Production tested with 1000+ transactions")
+func calculateTotal(items: number[]) -> number {
+  total = 0
+  // Sum all items
+  return total
+}
+
+// LESSON 3: Result Types & Pattern Matching
+// Use Result<Success, Error> instead of throwing exceptions
+
+@confidence(0.90, "Standard division logic")
+@complete
+func safeDivide(a: number, b: number) -> Result<number, string> {
+  if b == 0 {
+    return Err("Division by zero")
+  }
+  if a == 0 {
+    return Ok(0)
+  }
+  return Ok(a / b)
+}
+
+// Pattern match on results
+@confidence(0.92, "Handles all error cases")
+@complete
+func divideAndFormat(a: number, b: number) -> string {
+  safeDivide(a, b) match {
+    Ok(result) -> return "Result: " + result,
+    Err(error) -> return "Error: " + error
+  }
+}
+
+// LESSON 4: Nested Pattern Matching
+// You can match within matches for complex logic
+
+@confidence(0.85, "Tested with various inputs")
+@complete
+func complexCalculation(x: number, y: number) -> string {
+  safeDivide(x, 2) match {
+    Ok(half) -> {
+      safeDivide(half, y) match {
+        Ok(final) -> return "Final result: " + final,
+        Err(e) -> return "Second division failed: " + e
+      }
+    },
+    Err(e) -> return "First division failed: " + e
+  }
+}
+
+// LESSON 5: Error Recovery Blocks
+// Provide structured error context for debugging
+
+@confidence(0.80, "Has fallback mechanism")
+@partial
+func fetchUserData(userId: string) -> Result<string, string> {
+  result = database.query(userId) or error {
+    @context {
+      what_failed: "Database query",
+      what_i_tried: "SELECT * FROM users WHERE id = " + userId,
+      current_state: { userId: userId, connected: true },
+      likely_cause: "User not found or database timeout",
+      suggestions: [
+        "Check if userId exists",
+        "Verify database connection",
+        "Check query syntax"
+      ],
+      recovery: {
+        action: "try_cache",
+        command: "redis-cli GET user:" + userId
+      }
+    }
+    return getCachedUser(userId)
+  }
+
+  return Ok(result)
+}
+
+// LESSON 6: Explicit Dependencies
+// Use @needs to declare what your function requires
+
+@needs(database, api_key, logger)
+@confidence(0.88, "Dependencies properly validated")
+@complete
+func authenticateUser(token: string) -> Result<string, string> {
+  // Compiler ensures database, api_key, logger are available
+  // This prevents "undefined variable" bugs
+
+  if !token {
+    return Err("Missing token")
+  }
+
+  return Ok("authenticated")
+}
+
+// LESSON 7: Marking Uncertainty
+// Flag specific areas you're uncertain about
+
+@confidence(0.65, "Timezone handling unverified")
+@uncertain("Leap year calculation", "Daylight saving time", "Non-Gregorian calendars")
+@partial
+func parseDate(dateStr: string) -> Result<string, string> {
+  // Basic date parsing
+  if dateStr.contains("-") {
+    return Ok(dateStr)
+  }
+  return Err("Invalid date format")
+
+  // TODO: Handle timezones properly
+  // TODO: Validate leap years
+  // TODO: Support multiple date formats
+}
+
+// LESSON 8: Confidence-Based Fallback Chains
+// Try high-confidence methods first, fall back to lower confidence
+
+@confidence(0.92, "Multiple fallback strategies")
+@complete
+func robustFetch(url: string) -> Result<string, string> {
+  // Try primary method (confidence: 0.95)
+  primaryFetch(url) match {
+    Ok(data) -> return Ok(data),
+    Err(e) -> {
+      // Try secondary method (confidence: 0.85)
+      secondaryFetch(url) match {
+        Ok(data) -> return Ok(data),
+        Err(e2) -> {
+          // Try cache (confidence: 0.70)
+          return getCachedData(url)
+        }
+      }
+    }
+  }
+}
+
+// LESSON 9: Best Practices for AI Agents
+
+// DO: Start with @stub to get it compiling
+@stub
+func newFeature() { }
+
+// DO: Gradually improve to @partial
+@partial
+@confidence(0.60, "Basic implementation only")
+func newFeatureImproved() {
+  // Basic logic here
+}
+
+// DO: Mark areas you're uncertain about
+@uncertain("edge cases for empty arrays")
+func processArray(arr: number[]) -> number {
+  if arr.length == 0 {
+    return 0
+  }
+  return arr.length
+}
+
+// DO: Use pattern matching for clarity
+@complete
+func handleResult(r: Result<number, string>) -> string {
+  r match {
+    Ok(value) -> return "Success: " + value,
+    Err(error) -> return "Failed: " + error
+  }
+}
+
+// DON'T: Throw exceptions - use Result types
+// BAD (in other languages):
+//   throw new Error("Something failed")
+// GOOD (in Agentic):
+//   return Err("Something failed")
+
+// DON'T: Mark everything @complete if you're unsure
+// Better to be honest with @partial and low confidence
+
+// DON'T: Skip @confidence annotations
+// Always include them so humans know what to review
+
+// LESSON 10: Real-World Example - User Authentication
+
+@needs(database, jwt_secret, rate_limiter)
+@confidence(0.87, "Production tested, needs 2FA")
+@partial
+func fullAuthenticate(email: string, password: string) -> Result<string, string> {
+  // Validate inputs
+  if !email || !password {
+    return Err("Missing credentials")
+  }
+
+  // Check rate limiting
+  checkRateLimit(email) match {
+    Ok(allowed) -> {
+      // Continue
+    },
+    Err(e) -> return Err("Rate limited: " + e)
+  }
+
+  // Query database
+  findUser(email) match {
+    Ok(user) -> {
+      // Verify password
+      verifyPassword(password, user.hash) match {
+        Ok(valid) -> {
+          // Generate JWT
+          return Ok(generateJWT(user, jwt_secret))
+        },
+        Err(e) -> return Err("Invalid password")
+      }
+    },
+    Err(e) -> return Err("User not found")
+  }
+}
+
+// SUMMARY:
+// - Use @confidence to grade your work
+// - Use @stub/@partial/@complete to track progress
+// - Use Result<T, E> instead of exceptions
+// - Use pattern matching for elegant error handling
+// - Use @needs to declare dependencies
+// - Use @uncertain to flag risky code
+// - Use error recovery blocks for debugging context
+// - Be honest about limitations!

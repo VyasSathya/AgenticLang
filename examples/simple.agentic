@@ -1,0 +1,20 @@
+// Simple example demonstrating basic syntax
+
+@confidence(0.95)
+func add(a: number, b: number) -> number {
+    return a + b
+}
+
+@confidence(0.85)
+func greet(name: string) -> string {
+    if name.isEmpty() {
+        return "Hello, stranger!"
+    }
+
+    return "Hello, " + name + "!"
+}
+
+@stub("Not implemented yet")
+func complexCalculation(input: number) -> Result<number, Error> {
+    // TODO: Implement complex logic
+}

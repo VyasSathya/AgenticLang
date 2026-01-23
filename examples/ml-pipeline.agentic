@@ -1,0 +1,350 @@
+// Machine Learning Pipeline Example
+// Demonstrates: data processing, model inference, monitoring, cost optimization
+
+@module("ml_pipeline")
+
+// Data preprocessing with validation
+@confidence(0.91)
+@complete
+@needs(validator: DataValidator)
+@effects(io, state)
+@property("handles missing values")
+@property("normalizes numeric features")
+@property("encodes categorical features")
+func preprocessData(rawData: DataFrame) -> Result<ProcessedData, ValidationError> {
+  // Validate schema
+  @confidence(0.95)
+  validated = validator.validateSchema(rawData, schema: dataSchema) match {
+    Ok(data) -> data,
+    Err(errors) -> {
+      @context {
+        what_failed: "Schema validation",
+        errors: errors,
+        suggestions: ["Check data format", "Verify required columns present"]
+      }
+      return Err(ValidationError.SCHEMA_MISMATCH(errors))
+    }
+  }
+
+  // Handle missing values
+  @property("imputation preserves data distribution")
+  cleaned = validated
+    .fillna(strategy: "median", columns: numericColumns)
+    .fillna(strategy: "mode", columns: categoricalColumns)
+
+  // Normalize numeric features
+  @property("normalized values in range [0, 1]")
+  normalized = cleaned.normalize(columns: numericColumns, method: "min-max")
+
+  // Encode categorical features
+  @property("one-hot encoding preserves information")
+  encoded = normalized.oneHot(columns: categoricalColumns)
+
+  return Ok(ProcessedData {
+    data: encoded,
+    metadata: {
+      rowsProcessed: rawData.rows.length,
+      columnsProcessed: rawData.columns.length,
+      missingValuesHandled: countMissing(rawData),
+      encodingMaps: encoded.encodingMaps
+    }
+  })
+}
+
+// Model inference with cost tracking
+@cost_optimized(
+  cached_predictions: true,
+  batch_size: 32,
+  model_selection: "quality_vs_cost"
+)
+@confidence(0.89)
+@effects(llm_call, cost, async)
+func runInference(
+  input: ProcessedData,
+  userId: string
+) -> Result<Predictions, InferenceError> {
+  // Check cache first (zero cost)
+  cacheKey = hash(input)
+  cached = cache.get("predictions:${cacheKey}")
+
+  if cached {
+    @cost_saved(estimatedCost: 0.05)
+    @trace_decision("cache_hit", { cacheKey })
+    return Ok(cached)
+  }
+
+  // Check budget
+  budget = costRuntime.checkBudget(userId)
+
+  if budget.remaining < 0.10 {
+    return Err(InferenceError.BUDGET_EXCEEDED {
+      remaining: budget.remaining,
+      required: 0.10
+    })
+  }
+
+  // Select model based on input complexity
+  complexity = assessComplexity(input)
+
+  model = complexity match {
+    "simple" -> {
+      @llm_call(model: "gpt-4o-mini", max_tokens: 100)
+      @cost_tracked(userId: userId, feature: "inference_simple")
+      "gpt-4o-mini"
+    },
+    "moderate" -> {
+      @llm_call(model: "gpt-4o", max_tokens: 500)
+      @cost_tracked(userId: userId, feature: "inference_moderate")
+      "gpt-4o"
+    },
+    "complex" -> {
+      @llm_call(model: "o1-pro", max_tokens: 2000)
+      @cost_tracked(userId: userId, feature: "inference_complex")
+      @requires_approval(if: budget.remaining < 1.00)
+      "o1-pro"
+    }
+  }
+
+  // Run inference
+  @timeout(30s)
+  @retry(maxAttempts: 3, backoff: "exponential")
+  predictions = model.predict(input) match {
+    Ok(preds) -> preds,
+    Err(e) -> {
+      @context {
+        what_failed: "Model inference",
+        model: model,
+        inputSize: input.data.length,
+        suggestions: ["Check API status", "Verify input format", "Try simpler model"]
+      }
+      return Err(InferenceError.INFERENCE_FAILED(e))
+    }
+  }
+
+  // Cache successful predictions
+  cache.set("predictions:${cacheKey}", predictions, ttl: 1h)
+
+  // Monitor prediction confidence
+  @monitor_prediction_quality(
+    predictions: predictions,
+    threshold: 0.80,
+    alert_on_drift: true
+  )
+
+  return Ok(predictions)
+}
+
+// Batch inference for efficiency
+@batch_optimization(
+  maxBatchSize: 32,
+  maxWaitTime: 5s
+)
+@confidence(0.87)
+@effects(llm_call, cost, async)
+func batchInference(
+  inputs: ProcessedData[],
+  userId: string
+) -> Result<Predictions[], Error> {
+  // Batch requests to reduce per-request overhead
+  // 50-70% cost savings vs individual requests
+
+  batched = createBatches(inputs, size: 32)
+
+  @parallel(maxConcurrency: 4)
+  results = batched.map(batch => {
+    @llm_call(model: "gpt-4o-mini")
+    @cost_tracked(userId: userId, feature: "batch_inference")
+    return model.predictBatch(batch)
+  })
+
+  return Ok(results.flatten())
+}
+
+// Model monitoring and drift detection
+@healthcheck(interval: 5m)
+@confidence(0.88)
+@effects(database, io)
+func monitorModelPerformance() -> HealthStatus {
+  // Get recent predictions
+  predictions = database.predictions
+    .findRecent(limit: 1000)
+
+  // Calculate performance metrics
+  metrics = {
+    averageConfidence: mean(predictions.map(p => p.confidence)),
+    errorRate: predictions.filter(p => p.error).length / predictions.length,
+    latencyP95: percentile(predictions.map(p => p.latency), 0.95),
+    costPerPrediction: sum(predictions.map(p => p.cost)) / predictions.length
+  }
+
+  // Check for drift
+  if metrics.averageConfidence < 0.70 {
+    @alert("warning", {
+      message: "Model confidence declining",
+      averageConfidence: metrics.averageConfidence,
+      recommendation: "Consider retraining or model upgrade"
+    })
+    return HealthStatus.DEGRADED
+  }
+
+  if metrics.errorRate > 0.05 {
+    @alert("critical", {
+      message: "Error rate elevated",
+      errorRate: metrics.errorRate,
+      recommendation: "Investigate model or data issues"
+    })
+    return HealthStatus.FAILED
+  }
+
+  return HealthStatus.OK
+}
+
+// A/B testing for model comparison
+@ab_test(
+  variants: {
+    control: "gpt-4o-mini",
+    treatment: "fine-tuned-model-v2"
+  },
+  split: 0.5,  // 50/50 split
+  metric: "prediction_accuracy",
+  duration: 7d
+)
+@confidence(0.86)
+func compareModels(input: ProcessedData) -> Predictions {
+  // Automatically routes 50% to each model
+  // Tracks performance metrics
+  // Reports which model is better
+}
+
+// Feature engineering with confidence tracking
+@confidence(0.84)
+@partial("Basic features only, domain expertise needed for advanced")
+@uncertain("Optimal feature set not determined via experimentation")
+func engineerFeatures(rawData: DataFrame) -> EngineeeredFeatures {
+  features = {
+    // Numeric features
+    age: rawData.age,
+    income: log(rawData.income + 1),  // Log transform
+    creditScore: rawData.creditScore / 850,  // Normalize
+
+    // Categorical features
+    category: oneHot(rawData.category),
+    region: embedding(rawData.region),
+
+    // Interaction features
+    ageIncomeRatio: rawData.age / (rawData.income + 1),
+
+    // Time-based features
+    dayOfWeek: rawData.timestamp.dayOfWeek(),
+    hourOfDay: rawData.timestamp.hour()
+  }
+
+  @trace_features({
+    engineered: Object.keys(features).length,
+    original: rawData.columns.length,
+    transformation: "numeric_log_categorical_onehot"
+  })
+
+  return features
+}
+
+// Full ML pipeline orchestration
+@workflow(persistent: true, resumable: true)
+@confidence(0.85)
+@effects(io, database, llm_call, cost, async)
+func mlPipeline(
+  dataSource: DataSource,
+  userId: string
+) -> Result<MLPipelineOutput, PipelineError> {
+  // Step 1: Extract data
+  @checkpoint("data_extraction")
+  @retry(maxAttempts: 3)
+  rawData = dataSource.extract() match {
+    Ok(data) -> data,
+    Err(e) -> return Err(PipelineError.EXTRACTION_FAILED(e))
+  }
+
+  // Step 2: Preprocess
+  @checkpoint("preprocessing")
+  @confidence(0.91)
+  processed = preprocessData(rawData) match {
+    Ok(data) -> data,
+    Err(e) -> return Err(PipelineError.PREPROCESSING_FAILED(e))
+  }
+
+  // Step 3: Feature engineering
+  @checkpoint("feature_engineering")
+  @confidence(0.84)
+  features = engineerFeatures(processed.data)
+
+  // Step 4: Run inference
+  @checkpoint("inference")
+  @budget_limit(user_daily: 10.00, action: "throttle")
+  predictions = runInference(features, userId) match {
+    Ok(preds) -> preds,
+    Err(e) -> return Err(PipelineError.INFERENCE_FAILED(e))
+  }
+
+  // Step 5: Post-process and validate
+  @checkpoint("postprocessing")
+  @confidence(0.93)
+  @property("predictions in valid range")
+  validated = validatePredictions(predictions) match {
+    Ok(preds) -> preds,
+    Err(e) -> {
+      @alert("critical", "Prediction validation failed")
+      return Err(PipelineError.INVALID_PREDICTIONS(e))
+    }
+  }
+
+  // Step 6: Store results
+  @checkpoint("storage")
+  @transaction
+  database.predictions.insert({
+    userId: userId,
+    predictions: validated,
+    metadata: {
+      dataSource: dataSource.name,
+      timestamp: now(),
+      modelVersion: getCurrentModelVersion(),
+      cost: getTotalCost(userId)
+    }
+  })
+
+  @checkpoint("complete")
+
+  return Ok(MLPipelineOutput {
+    predictions: validated,
+    metadata: {
+      processingTime: elapsed(),
+      totalCost: getTotalCost(userId),
+      confidence: averageConfidence(validated)
+    }
+  })
+}
+
+// Monitoring dashboard data
+@confidence(0.92)
+@effects(database, io)
+func getMLMetrics(period: Period) -> MLMetricsDashboard {
+  return MLMetricsDashboard {
+    totalPredictions: database.predictions.count(period),
+    averageLatency: database.predictions.averageLatency(period),
+    errorRate: database.predictions.errorRate(period),
+    costMetrics: {
+      totalCost: costRuntime.getTotal(period),
+      costPerPrediction: costRuntime.getAverage(period),
+      costByModel: costRuntime.getByModel(period)
+    },
+    qualityMetrics: {
+      averageConfidence: database.predictions.averageConfidence(period),
+      mutationScore: getLatestMutationScore(),
+      verificationStatus: getVerificationStatus()
+    },
+    usageMetrics: {
+      topUsers: database.predictions.topUsers(period, limit: 10),
+      topFeatures: database.predictions.topFeatures(period, limit: 10),
+      peakHours: database.predictions.getHourlyDistribution(period)
+    }
+  }
+}

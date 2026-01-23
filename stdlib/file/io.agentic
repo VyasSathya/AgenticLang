@@ -1,0 +1,194 @@
+// File I/O Module
+// @agentic/fs - Buffered file operations with error recovery
+
+@module("file")
+@confidence(0.94)
+
+type FileMode = "r" | "w" | "a" | "r+" | "w+" | "a+"
+
+type WriteOptions {
+  overwrite: boolean = false
+  createDirectories: boolean = false
+  encoding: string = "utf-8"
+}
+
+@effects(file_system, async, io)
+@confidence(0.96)
+@complete
+@property("handles missing files")
+@property("handles permission errors")
+@property("respects encoding")
+@needs(fs: FileSystem)
+func readFile(path: string, encoding: string = "utf-8") -> Promise<Result<string, FileError>> {
+  if !fs.exists(path) {
+    return Err(FileError.NOT_FOUND(path))
+  }
+
+  @retry(maxAttempts: 2, delay: 100ms)
+  content = fs.read(path, encoding) or error {
+    @context {
+      what_failed: "File read",
+      path: path,
+      encoding: encoding,
+      suggestions: [
+        "Check file permissions",
+        "Verify path is correct",
+        "Try different encoding (utf-8, ascii, utf-16)"
+      ],
+      recovery: {
+        action: "use_default",
+        command: "echo '' > ${path}"
+      }
+    }
+    return Err(FileError.READ_ERROR(error))
+  }
+
+  return Ok(content)
+}
+
+@effects(file_system, async, io)
+@confidence(0.95)
+@complete
+@property("creates parent directories if requested")
+@property("respects overwrite option")
+@property("handles write errors gracefully")
+@needs(fs: FileSystem)
+func writeFile(
+  path: string,
+  content: string,
+  options: WriteOptions = WriteOptions{}
+) -> Promise<Result<void, FileError>> {
+  if fs.exists(path) and !options.overwrite {
+    return Err(FileError.ALREADY_EXISTS(path))
+  }
+
+  if options.createDirectories {
+    parentDir = path.dirname()
+    if !fs.exists(parentDir) {
+      fs.createDir(parentDir, recursive: true)
+    }
+  }
+
+  @retry(maxAttempts: 2, delay: 100ms)
+  fs.write(path, content, options.encoding) or error {
+    @context {
+      what_failed: "File write",
+      path: path,
+      size: content.length,
+      suggestions: [
+        "Check disk space",
+        "Verify permissions",
+        "Check if path is valid"
+      ]
+    }
+    return Err(FileError.WRITE_ERROR(error))
+  }
+
+  return Ok(void)
+}
+
+// Buffered reader for large files
+@effects(file_system, async, io, state)
+type BufferedReader {
+  bufferSize: number = 64 * 1024  // 64KB default
+
+  @confidence(0.95)
+  @property("returns None on EOF")
+  func readLine(self) -> Promise<Result<Option<string>, IoError>> {
+    // Read next line from buffer
+    // Returns None when EOF reached
+  }
+
+  @confidence(0.96)
+  func readChunk(self, size: number) -> Promise<Result<Buffer, IoError>> {
+    // Read exactly size bytes
+    // Returns smaller chunk at EOF
+  }
+
+  @confidence(0.94)
+  func readAll(self) -> Promise<Result<string, IoError>> {
+    lines: string[] = []
+
+    loop {
+      line = self.readLine() match {
+        Ok(Some(l)) -> l,
+        Ok(None) -> break,
+        Err(e) -> return Err(e)
+      }
+
+      lines.push(line)
+    }
+
+    return Ok(lines.join("\n"))
+  }
+
+  @confidence(0.98)
+  func close(self) -> Promise<void> {
+    // Close file handle and flush buffer
+  }
+}
+
+// Stream processing for huge files
+@effects(file_system, async, io)
+@confidence(0.92)
+@partial("Memory-efficient but no backpressure yet")
+func stream(path: string) -> AsyncIterator<string> {
+  reader = BufferedReader { bufferSize: 64 * 1024 }
+
+  return async iterator {
+    loop {
+      line = reader.readLine() match {
+        Ok(Some(l)) -> yield l,
+        Ok(None) -> return,
+        Err(e) -> throw e
+      }
+    }
+  }
+}
+
+// Directory operations
+@effects(file_system, io)
+@confidence(0.96)
+@complete
+@property("returns empty array for empty directory")
+@property("handles missing directory")
+func listDir(path: string) -> Promise<Result<string[], FileError>> {
+  if !fs.exists(path) {
+    return Err(FileError.NOT_FOUND(path))
+  }
+
+  if !fs.isDirectory(path) {
+    return Err(FileError.NOT_A_DIRECTORY(path))
+  }
+
+  entries = fs.readDir(path) or error {
+    return Err(FileError.READ_ERROR(error))
+  }
+
+  return Ok(entries)
+}
+
+@effects(file_system, io)
+@confidence(0.97)
+@complete
+@property("creates directory if not exists")
+@property("handles recursive creation")
+func createDir(path: string, recursive: boolean = false) -> Promise<Result<void, FileError>> {
+  if fs.exists(path) {
+    return Ok(void)  // Already exists
+  }
+
+  options = { recursive: recursive }
+
+  fs.mkdir(path, options) or error {
+    @context {
+      what_failed: "Directory creation",
+      path: path,
+      recursive: recursive,
+      suggestions: ["Check parent directory exists", "Verify permissions"]
+    }
+    return Err(FileError.CREATE_ERROR(error))
+  }
+
+  return Ok(void)
+}

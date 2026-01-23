@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Playground - Try AI-Native Programming in Your Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .header {
+            background: #252526;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #4ec9b0;
+        }
+
+        .header .buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #1177bb;
+        }
+
+        .btn.success {
+            background: #388a34;
+        }
+
+        .btn.success:hover {
+            background: #4caf50;
+        }
+
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #3e3e42;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            background: #2d2d30;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #3e3e42;
+            font-weight: 600;
+            color: #cccccc;
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #agentic-editor,
+        #typescript-output {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .console {
+            background: #1e1e1e;
+            color: #cccccc;
+            padding: 1rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            height: 200px;
+            border-top: 1px solid #3e3e42;
+        }
+
+        .console-line {
+            margin-bottom: 0.5rem;
+        }
+
+        .console-line.error {
+            color: #f48771;
+        }
+
+        .console-line.success {
+            color: #4ec9b0;
+        }
+
+        .console-line.warning {
+            color: #dcdcaa;
+        }
+
+        .examples {
+            background: #252526;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 0.25rem 0.75rem;
+            background: #3e3e42;
+            color: #cccccc;
+            border: 1px solid #555;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .example-btn:hover {
+            background: #505050;
+        }
+
+        .footer {
+            background: #252526;
+            padding: 0.5rem 2rem;
+            border-top: 1px solid #3e3e42;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: #4ec9b0;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ Agentic Playground</h1>
+        <div class="buttons">
+            <button class="btn" id="compile-btn">▶ Compile</button>
+            <button class="btn success" id="share-btn">🔗 Share</button>
+        </div>
+    </div>
+
+    <div class="examples">
+        <button class="example-btn" data-example="hello">Hello World</button>
+        <button class="example-btn" data-example="confidence">Confidence Tracking</button>
+        <button class="example-btn" data-example="result">Result Types</button>
+        <button class="example-btn" data-example="stages">Incremental Stages</button>
+        <button class="example-btn" data-example="agents">Multi-Agent</button>
+        <button class="example-btn" data-example="verification">Formal Verification</button>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="panel-header">Agentic Code</div>
+            <div class="editor-container">
+                <div id="agentic-editor"></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">Generated TypeScript</div>
+            <div class="editor-container">
+                <div id="typescript-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="console" id="console">
+        <div class="console-line success">✓ Agentic Playground Ready</div>
+        <div class="console-line">Click "Compile" or press Ctrl+Enter to transpile</div>
+    </div>
+
+    <div class="footer">
+        Made with ❤️ for AI Agents |
+        <a href="https://github.com/agentic-lang/agentic">GitHub</a> |
+        <a href="https://agentic-lang.org/docs">Docs</a> |
+        <a href="https://discord.gg/agentic">Discord</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script src="./playground.js"></script>
+</body>
+</html>

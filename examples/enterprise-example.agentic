@@ -1,0 +1,360 @@
+// Enterprise-Grade Application Example
+// Demonstrates: audit logging, compliance, security, observability
+
+@module("enterprise")
+
+// Audit logging for compliance
+@audit_trail(
+  retention: 7 * 365d,  // 7 years (regulatory requirement)
+  encryption: "AES-256",
+  immutable: true,
+  compliance: ["SOC2", "HIPAA", "GDPR"]
+)
+@confidence(0.96)
+@complete
+func processFinancialTransaction(
+  transaction: Transaction,
+  user: User
+) -> Result<Receipt, TransactionError> {
+  @audit.start({
+    action: "financial_transaction",
+    userId: user.id,
+    amount: transaction.amount,
+    timestamp: now(),
+    ipAddress: user.ipAddress,
+    userAgent: user.userAgent
+  })
+
+  // Validate user permissions
+  @requires_permission("financial.transactions.process")
+  if !user.hasPermission("financial.transactions.process") {
+    @audit.fail("insufficient_permissions", {
+      required: "financial.transactions.process",
+      userPermissions: user.permissions
+    })
+    return Err(TransactionError.INSUFFICIENT_PERMISSIONS)
+  }
+
+  // Validate transaction
+  @confidence(0.94)
+  validation = validateTransaction(transaction) match {
+    Ok(_) -> {},
+    Err(e) -> {
+      @audit.fail("validation_failed", { error: e, transaction })
+      return Err(TransactionError.VALIDATION_FAILED(e))
+    }
+  }
+
+  // Check for fraud
+  @confidence(0.89)
+  @llm_call(model: "fraud-detection-v2")
+  fraudCheck = detectFraud(transaction, user.history) match {
+    Ok(result) if result.score < 0.3 -> {},  // Low fraud risk
+    Ok(result) if result.score < 0.7 -> {
+      // Medium risk - require additional approval
+      @requires_approval(
+        approvers: ["fraud_team"],
+        timeout: 30m,
+        escalation: "security_team"
+      )
+      @audit.warning("fraud_check_flagged", { score: result.score })
+    },
+    Ok(result) -> {
+      // High risk - reject
+      @audit.fail("fraud_detected", {
+        score: result.score,
+        reasons: result.reasons
+      })
+      return Err(TransactionError.FRAUD_DETECTED)
+    },
+    Err(e) -> {
+      @audit.error("fraud_check_error", { error: e })
+      // Fail closed - require manual review
+      @escalate_to_human("Fraud detection system unavailable")
+    }
+  }
+
+  // Execute transaction with two-phase commit
+  @transaction(isolation: "serializable")
+  @confidence(0.93)
+  receipt = executeTransaction(transaction) match {
+    Ok(r) -> r,
+    Err(e) -> {
+      @audit.fail("transaction_execution_failed", { error: e })
+      return Err(TransactionError.EXECUTION_FAILED(e))
+    }
+  }
+
+  // Success audit
+  @audit.success({
+    receiptId: receipt.id,
+    amount: transaction.amount,
+    timestamp: now(),
+    processingTime: elapsed()
+  })
+
+  // GDPR: Record data processing
+  @gdpr_record({
+    dataSubject: user.id,
+    processing: "financial_transaction",
+    legalBasis: "contract",
+    purpose: "service_delivery",
+    retention: "7_years_regulatory"
+  })
+
+  return Ok(receipt)
+}
+
+// PII handling with encryption
+@pii_protection(
+  encrypt: ["ssn", "creditCard", "bankAccount"],
+  mask_in_logs: true,
+  requires_consent: true
+)
+@confidence(0.97)
+@complete
+func storeUserData(data: SensitiveUserData) -> Result<void, PrivacyError> {
+  // Check consent
+  if !data.user.hasConsent("data_storage") {
+    @audit.compliance_violation("missing_consent", {
+      userId: data.user.id,
+      dataTypes: ["pii", "financial"]
+    })
+    return Err(PrivacyError.MISSING_CONSENT)
+  }
+
+  // Encrypt PII automatically
+  encrypted = {
+    userId: data.user.id,
+    ssn: encrypt(data.ssn, key: envVar("PII_ENCRYPTION_KEY")),
+    creditCard: encrypt(data.creditCard, key: envVar("PII_ENCRYPTION_KEY")),
+    // Non-PII stored as-is
+    name: data.name,
+    email: data.email
+  }
+
+  database.sensitive_data.insert(encrypted) match {
+    Ok(_) -> {
+      @audit.pii_stored({
+        userId: data.user.id,
+        dataTypes: ["ssn", "creditCard"],
+        encrypted: true
+      })
+      return Ok(void)
+    },
+    Err(e) -> {
+      @audit.error("pii_storage_failed", { error: e })
+      return Err(PrivacyError.STORAGE_FAILED(e))
+    }
+  }
+}
+
+// GDPR right to erasure
+@gdpr_compliant(right: "erasure")
+@confidence(0.94)
+@complete
+@property("removes all user data")
+@property("cascades to related records")
+@property("generates deletion certificate")
+func deleteUserData(userId: string, reason: string) -> Result<DeletionCertificate, Error> {
+  @audit.start({
+    action: "gdpr_erasure",
+    userId: userId,
+    reason: reason,
+    requestedBy: getCurrentUser().id
+  })
+
+  // Find all user data across systems
+  @parallel(maxConcurrency: 5)
+  deletions = [
+    database.users.delete(userId),
+    database.transactions.deleteByUser(userId),
+    database.sensitive_data.deleteByUser(userId),
+    redis.deleteUserSessions(userId),
+    s3.deleteUserFiles(userId)
+  ]
+
+  // Verify all deletions succeeded
+  failures = deletions.filter(r => r.isErr())
+
+  if failures.length > 0 {
+    @audit.fail("incomplete_deletion", { failures })
+    return Err(Error.INCOMPLETE_DELETION {
+      failed: failures.length,
+      total: deletions.length
+    })
+  }
+
+  // Generate deletion certificate (legal requirement)
+  certificate = DeletionCertificate {
+    userId: userId,
+    deletedAt: now(),
+    requestReason: reason,
+    systemsAffected: ["database", "redis", "s3"],
+    verification: hash(deletions),
+    signature: sign(userId, now())
+  }
+
+  @audit.success({
+    userId: userId,
+    certificate: certificate.id
+  })
+
+  return Ok(certificate)
+}
+
+// Role-based access control
+@rbac(
+  resource: "financial_reports",
+  requiredRoles: ["accountant", "cfo", "auditor"]
+)
+@confidence(0.95)
+@complete
+func generateFinancialReport(
+  period: Period,
+  user: User
+) -> Result<FinancialReport, AccessError> {
+  // Automatic RBAC check before function executes
+
+  if !user.hasAnyRole(["accountant", "cfo", "auditor"]) {
+    @audit.access_denied({
+      userId: user.id,
+      resource: "financial_reports",
+      requiredRoles: ["accountant", "cfo", "auditor"],
+      userRoles: user.roles
+    })
+    return Err(AccessError.INSUFFICIENT_PRIVILEGES)
+  }
+
+  @audit.access_granted({
+    userId: user.id,
+    resource: "financial_reports",
+    userRole: user.roles.first()
+  })
+
+  report = compileFinancialData(period)
+
+  @audit.report_generated({
+    reportId: report.id,
+    period: period,
+    generatedBy: user.id,
+    dataPoints: report.data.length
+  })
+
+  return Ok(report)
+}
+
+// Distributed tracing for microservices
+@opentelemetry(
+  service: "enterprise-app",
+  exporter: "otlp",
+  endpoint: "https://telemetry.company.com"
+)
+@confidence(0.91)
+@effects(network, database, io, async)
+func orchestrateWorkflow(request: WorkflowRequest) -> Result<WorkflowOutput, Error> {
+  @span("validate_request", attributes: {
+    workflowType: request.type,
+    requestedBy: request.userId
+  })
+  validation = validateRequest(request)
+
+  @span("fetch_user_data", attributes: {
+    userId: request.userId
+  })
+  @retry(maxAttempts: 3, backoff: "exponential")
+  userData = database.users.find(request.userId)
+
+  @span("external_api_call", attributes: {
+    api: "partner-service",
+    timeout: "10s"
+  })
+  @circuit_breaker(threshold: 5, timeout: 60s)
+  externalData = partnerAPI.fetch(request.partnerId)
+
+  @span("llm_processing", attributes: {
+    model: "gpt-4o",
+    max_tokens: 1000
+  })
+  @cost_tracked(userId: request.userId, feature: "workflow_processing")
+  processed = llm.process({
+    userData: userData,
+    externalData: externalData,
+    instructions: request.instructions
+  })
+
+  @span("store_results")
+  database.results.insert(processed)
+
+  return Ok(WorkflowOutput {
+    result: processed,
+    traceId: getCurrentTraceId()
+  })
+}
+
+// Security: Input sanitization
+@security_hardened(
+  injection_prevention: ["sql", "xss", "command"],
+  rate_limiting: { requests: 100, window: "1m" },
+  ip_whitelist: ["10.0.0.0/8", "192.168.0.0/16"]
+)
+@confidence(0.95)
+@complete
+func executeUserQuery(
+  query: UserQuery,
+  user: User
+) -> Result<QueryResult, SecurityError> {
+  // Automatic input sanitization
+  sanitized = SecurityGuard.sanitize(query) match {
+    Ok(q) -> q,
+    Err(e) -> {
+      @audit.security_violation({
+        type: "input_validation_failed",
+        userId: user.id,
+        violationType: e.violationType,
+        blocked: true
+      })
+      return Err(SecurityError.MALICIOUS_INPUT(e))
+    }
+  }
+
+  // Check rate limit
+  if RateLimiter.isExceeded(user.id) {
+    @audit.rate_limit_exceeded({ userId: user.id })
+    return Err(SecurityError.RATE_LIMIT_EXCEEDED)
+  }
+
+  // Execute with parameterized query (prevents SQL injection)
+  result = database.query(sanitized.sql, sanitized.params)
+
+  return Ok(result)
+}
+
+// Compliance reporting
+@compliance_report(
+  standard: "SOC2_TYPE2",
+  controls: ["access_control", "encryption", "audit_logging"]
+)
+@confidence(0.92)
+func generateSOC2Report(period: Period) -> SOC2Report {
+  auditLogs = collectAuditLogs(period)
+  accessLogs = collectAccessLogs(period)
+  securityIncidents = collectSecurityIncidents(period)
+
+  evidence = {
+    totalAuditEvents: auditLogs.length,
+    accessControlViolations: accessLogs.filter(l => l.denied).length,
+    securityIncidents: securityIncidents.length,
+    encryptionCoverage: calculateEncryptionCoverage(),
+    backupVerification: verifyBackups(period)
+  }
+
+  return SOC2Report {
+    period: period,
+    controls: evaluateControls(evidence),
+    evidence: evidence,
+    compliance: assessCompliance(evidence),
+    generatedAt: now(),
+    signature: signReport(evidence)
+  }
+}

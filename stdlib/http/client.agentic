@@ -1,0 +1,168 @@
+// HTTP Client Module
+// @agentic/http - Production-grade HTTP client with connection pooling
+
+@module("http")
+@confidence(0.95)
+
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD"
+
+type HttpHeaders = Map<string, string>
+
+type HttpRequest {
+  method: HttpMethod
+  url: string
+  headers: HttpHeaders
+  body: Option<string>
+  timeout: Option<Duration>
+}
+
+type HttpResponse {
+  status: number
+  headers: HttpHeaders
+  body: string
+
+  @confidence(0.98)
+  func json<T>(self) -> Result<T, ParseError> {
+    return JSON.parse(self.body)
+  }
+
+  @confidence(0.99)
+  func text(self) -> string {
+    return self.body
+  }
+}
+
+type HttpClientConfig {
+  baseUrl: Option<string>
+  defaultHeaders: HttpHeaders
+  timeout: Duration = 30s
+  maxConnections: number = 100
+  keepAlive: boolean = true
+  retryPolicy: Option<RetryPolicy>
+}
+
+@needs(config: HttpClientConfig)
+@effects(network, async, io)
+type HttpClient {
+  config: HttpClientConfig
+
+  @confidence(0.92)
+  @property("handles network errors gracefully")
+  @property("respects timeout")
+  @property("retries on transient failures")
+  func get(self, url: string) -> Promise<Result<HttpResponse, HttpError>> {
+    request = HttpRequest {
+      method: "GET",
+      url: self.resolveUrl(url),
+      headers: self.config.defaultHeaders,
+      body: None,
+      timeout: Some(self.config.timeout)
+    }
+
+    return self.request(request)
+  }
+
+  @confidence(0.92)
+  @property("validates request body")
+  @property("sets content-type header")
+  func post(self, url: string, body: string) -> Promise<Result<HttpResponse, HttpError>> {
+    headers = self.config.defaultHeaders.clone()
+    headers.set("Content-Type", "application/json")
+
+    request = HttpRequest {
+      method: "POST",
+      url: self.resolveUrl(url),
+      headers: headers,
+      body: Some(body),
+      timeout: Some(self.config.timeout)
+    }
+
+    return self.request(request)
+  }
+
+  @confidence(0.90)
+  @complete
+  @needs(network: NetworkAccess, logger: Logger)
+  @effects(network, async, io, exception)
+  func request(self, req: HttpRequest) -> Promise<Result<HttpResponse, HttpError>> {
+    logger.info("HTTP ${req.method} ${req.url}")
+
+    @retry(maxAttempts: 3, backoff: "exponential")
+    @circuit_breaker(threshold: 5, timeout: 60s)
+    response = network.fetch(req.url, {
+      method: req.method,
+      headers: req.headers,
+      body: req.body,
+      timeout: req.timeout
+    }) match {
+      Ok(resp) -> {
+        logger.info("HTTP ${req.method} ${req.url} -> ${resp.status}")
+        return Ok(resp)
+      },
+      Err(error) -> {
+        @context {
+          what_failed: "HTTP request",
+          request: { method: req.method, url: req.url },
+          suggestions: [
+            "Check network connectivity",
+            "Verify URL is correct",
+            "Check if server is running"
+          ],
+          recovery: {
+            action: "retry",
+            command: "http.request(req)"
+          }
+        }
+        logger.error("HTTP ${req.method} ${req.url} failed", error)
+        return Err(HttpError.NETWORK_ERROR(error))
+      }
+    }
+  }
+
+  @confidence(0.99)
+  private func resolveUrl(self, path: string) -> string {
+    if path.startsWith("http://") or path.startsWith("https://") {
+      return path
+    }
+
+    if self.config.baseUrl {
+      return self.config.baseUrl + path
+    }
+
+    return path
+  }
+}
+
+// Factory function
+@confidence(0.98)
+@complete
+func createClient(config: HttpClientConfig) -> HttpClient {
+  return HttpClient { config: config }
+}
+
+@confidence(0.99)
+func defaultClient() -> HttpClient {
+  return createClient(HttpClientConfig {
+    baseUrl: None,
+    defaultHeaders: Map.new(),
+    timeout: Duration.seconds(30),
+    maxConnections: 100,
+    keepAlive: true,
+    retryPolicy: None
+  })
+}
+
+// Convenience helpers
+@confidence(0.95)
+@effects(network, async)
+func get(url: string) -> Promise<Result<HttpResponse, HttpError>> {
+  client = defaultClient()
+  return client.get(url)
+}
+
+@confidence(0.95)
+@effects(network, async)
+func post(url: string, body: string) -> Promise<Result<HttpResponse, HttpError>> {
+  client = defaultClient()
+  return client.post(url, body)
+}

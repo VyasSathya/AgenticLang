@@ -1,0 +1,212 @@
+// Multi-Agent Coordination Example
+// Demonstrates session types, message passing, and handoffs
+
+@agent(role: "coordinator", capabilities: ["task_planning", "delegation"])
+agent CoordinatorAgent {
+  inbox: Channel<TaskRequest>
+  outbox: Channel<TaskAssignment>
+
+  @handler("task_request")
+  @confidence(0.90)
+  func handleRequest(request: TaskRequest) -> TaskAssignment {
+    // Analyze task complexity
+    complexity = analyzeComplexity(request)
+
+    assignment = complexity match {
+      "simple" -> assignToWorker(request),
+      "complex" -> assignToSpecialist(request),
+      "uncertain" -> requestHumanReview(request)
+    }
+
+    return assignment
+  }
+}
+
+@agent(role: "worker", capabilities: ["task_execution"])
+agent WorkerAgent {
+  inbox: Channel<TaskAssignment>
+  outbox: Channel<TaskResult>
+
+  @handler("task_assignment")
+  @confidence(0.85)
+  @session_aware
+  func executeTask(assignment: TaskAssignment) -> TaskResult {
+    @checkpoint("start")
+    session.save({ assignmentId: assignment.id, status: "started" })
+
+    @confidence(0.80)
+    result = processTask(assignment.task)
+
+    @checkpoint("complete")
+    session.save({ assignmentId: assignment.id, status: "complete", result: result })
+
+    return TaskResult {
+      assignmentId: assignment.id,
+      output: result,
+      confidence: 0.85
+    }
+  }
+}
+
+// Main workflow orchestration
+@workflow(persistent: true, resumable: true)
+workflow TaskProcessingPipeline {
+  states: [Idle, Processing, Review, Complete, Failed]
+
+  Idle -> Processing on TaskReceived {
+    @confidence(0.92)
+    coordinator.send(TaskRequest { task: event.task })
+  }
+
+  Processing -> Review on LowConfidence {
+    @handoff {
+      to: "human_reviewer",
+      reason: "Task confidence below threshold",
+      context: {
+        task: current_task,
+        confidence: 0.65,
+        attempted_approaches: ["approach_a", "approach_b"]
+      }
+    }
+  }
+
+  Processing -> Complete on HighConfidence {
+    @confidence(0.90)
+    finalizeTask(result)
+  }
+
+  Review -> Processing on ReviewComplete {
+    // Resume after human review
+    @resume_from_checkpoint("processing_start")
+  }
+
+  * -> Failed on Error @max_attempts(3)
+}
+
+// Human-in-the-Loop approval example
+@requires_approval(
+  channel: "slack",
+  approvers: ["team_lead"],
+  timeout: 1h,
+  fallback: "reject"
+)
+@confidence(0.75)
+func deployToProduction(artifact: Artifact) -> Result<Deployment, Error> {
+  // This code won't execute until approved
+  @trace_decision("deployment_approved", {
+    artifact: artifact.id,
+    version: artifact.version,
+    approver: approval.approver
+  })
+
+  deployment = deploy(artifact)
+
+  return Ok(deployment)
+}
+
+// Session persistence and resumption
+@session(id: "user_onboarding", storage: "database")
+@resumable
+@checkpoint_interval(5m)
+func onboardUser(userId: string) -> Result<User, OnboardingError> {
+  // Step 1: Create account
+  @checkpoint("account_created")
+  account = createAccount(userId)
+  session.save({ step: 1, accountId: account.id })
+
+  // Step 2: Send verification email
+  @checkpoint("email_sent")
+  email = sendVerificationEmail(account.email)
+  session.save({ step: 2, emailId: email.id })
+
+  // Step 3: Wait for verification (resumable)
+  @checkpoint("awaiting_verification")
+  @resumable_point
+  verification = awaitVerification(account.id, timeout: 24h)
+
+  // If timeout, session can be resumed when user verifies
+  if verification.timedOut {
+    @pause_session({
+      reason: "Awaiting user email verification",
+      resumeOn: "email_verified_event",
+      state: { accountId: account.id, emailSent: true }
+    })
+  }
+
+  // Step 4: Complete onboarding
+  @checkpoint("complete")
+  user = completeOnboarding(account, verification)
+
+  return Ok(user)
+}
+
+// Cost-aware LLM usage
+@budget_limit(user_daily: 10.00, action: "throttle")
+@cost_optimized(
+  models: {
+    cheap: "gpt-4o-mini",
+    standard: "gpt-4o",
+    premium: "o1-pro"
+  }
+)
+func generateSummary(document: string, userId: string) -> Result<Summary, Error> {
+  // Check budget first
+  budget = costRuntime.checkBudget(userId)
+
+  if budget.remaining < 0.50 {
+    return Err(BudgetError {
+      message: "Insufficient budget",
+      remaining: budget.remaining
+    })
+  }
+
+  // Start with cheapest model
+  @llm_call(model: "gpt-4o-mini", max_tokens: 500)
+  @cost_tracked(userId: userId, feature: "summarization")
+  summary = llm.summarize(document)
+
+  if summary.confidence < 0.85 {
+    // Escalate to better model if needed and budget allows
+    if budget.remaining > 2.00 {
+      @llm_call(model: "gpt-4o", max_tokens: 500)
+      summary = llm.summarize(document)
+    }
+  }
+
+  return Ok(summary)
+}
+
+// Safety guardrails example
+@input_guardrails(
+  pii_detection: true,
+  prompt_injection: true,
+  toxicity_threshold: 0.8
+)
+@output_guardrails(
+  checks: ["toxicity", "bias", "pii"],
+  enforcement: "block"
+)
+@confidence(0.92)
+func moderateContent(content: UserContent) -> Result<ModerationDecision, Error> {
+  // Input validation happens automatically via @input_guardrails
+
+  @llm_call(model: "gpt-4o")
+  analysis = llm.analyzeContent(content.text)
+
+  // Output validation happens automatically via @output_guardrails
+
+  decision = analysis.toxicity match {
+    score if score > 0.8 -> Reject("High toxicity detected"),
+    score if score > 0.5 -> Flag("Moderate toxicity, needs review"),
+    _ -> Approve()
+  }
+
+  @audit_trail({
+    action: "content_moderation",
+    decision: decision,
+    scores: analysis,
+    confidence: 0.92
+  })
+
+  return Ok(decision)
+}
