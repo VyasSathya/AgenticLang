@@ -16,5 +16,12 @@
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "examples"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "examples",
+    "tests",
+    "src/property-tests/generator.ts",
+    "src/wasm/**/*"
+  ]
 }

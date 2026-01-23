@@ -100,7 +100,8 @@ export class RefinementTypeChecker {
         counterexample: valid ? undefined : { [refinement.variable]: value },
       };
     } catch (error) {
-      return { valid: false, counterexample: { error: error.message } };
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return { valid: false, counterexample: { error: errorMessage } };
     }
   }
 
