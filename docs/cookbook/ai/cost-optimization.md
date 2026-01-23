@@ -11,9 +11,9 @@ Use Agentic's cost tracking and optimization features:
 ```agentic
 @cost_optimized(
   models: {
-    cheap: { name: "gpt-4o-mini", cost_per_1k: 0.15 },
-    standard: { name: "gpt-4o", cost_per_1k: 2.50 },
-    premium: { name: "o1-pro", cost_per_1k: 15.00 }
+    cheap: { name: "gpt-4.5-turbo", cost_per_1k: 0.15 },
+    standard: { name: "gpt-4.5", cost_per_1k: 2.50 },
+    premium: { name: "o3", cost_per_1k: 15.00 }
   },
   quality_threshold: 0.85
 )
@@ -32,7 +32,7 @@ func generateContent(prompt: string, userId: string) -> Result<Content, Error> {
   }
 
   // Try cheapest model first
-  @llm_call(model: "gpt-4o-mini", max_tokens: 500)
+  @llm_call(model: "gpt-4.5-turbo", max_tokens: 500)
   @cost_tracked(userId: userId, feature: "content_generation")
   result = llm.generate({
     system: "Generate high-quality content",
@@ -42,7 +42,7 @@ func generateContent(prompt: string, userId: string) -> Result<Content, Error> {
 
   // If quality is insufficient, escalate to better model
   if result.confidence < 0.85 && budget.remaining > 2.00 {
-    @llm_call(model: "gpt-4o", max_tokens: 500)
+    @llm_call(model: "gpt-4.5", max_tokens: 500)
     @cost_tracked(userId: userId, feature: "content_generation_premium")
     result = llm.generate({
       system: "Generate high-quality content",
@@ -79,18 +79,18 @@ Automatically route to cheaper models when appropriate:
 
 ```agentic
 @cost_router(
-  simple_queries: "gpt-4o-mini",      // $0.15/1K tokens
-  complex_queries: "gpt-4o",          // $2.50/1K tokens
-  reasoning_tasks: "o1-pro"           // $15.00/1K tokens
+  simple_queries: "gpt-4.5-turbo",      // $0.15/1K tokens
+  complex_queries: "gpt-4.5",          // $2.50/1K tokens
+  reasoning_tasks: "o3"           // $15.00/1K tokens
 )
 @confidence(0.86)
 func smartRoute(query: Query) -> Result<Response, Error> {
   complexity = assessComplexity(query)
 
   model = complexity match {
-    "simple" -> "gpt-4o-mini",
-    "complex" -> "gpt-4o",
-    "reasoning" -> "o1-pro"
+    "simple" -> "gpt-4.5-turbo",
+    "complex" -> "gpt-4.5",
+    "reasoning" -> "o3"
   }
 
   return generateWithModel(query, model)
@@ -143,7 +143,7 @@ func batchGenerate(prompts: string[]) -> Result<Content[], Error> {
     `[Item ${i}]: ${p}`
   ).join("\n\n")
 
-  @llm_call(model: "gpt-4o-mini", max_tokens: 2000)
+  @llm_call(model: "gpt-4.5-turbo", max_tokens: 2000)
   batchResult = llm.generate(batchPrompt)
 
   // Parse batch response
@@ -172,7 +172,7 @@ func cachedGenerate(prompt: string) -> Result<Content, Error> {
   }
 
   // Cache miss - call LLM
-  @llm_call(model: "gpt-4o-mini")
+  @llm_call(model: "gpt-4.5-turbo")
   @cost_tracked(userId: "system", feature: "generation")
   result = llm.generate(prompt)
 
@@ -187,8 +187,8 @@ func cachedGenerate(prompt: string) -> Result<Content, Error> {
 
 ```agentic
 @fallback_chain(
-  primary: "gpt-4o",
-  fallbacks: ["gpt-4o-mini", "cache", "default_response"]
+  primary: "gpt-4.5",
+  fallbacks: ["gpt-4.5-turbo", "cache", "default_response"]
 )
 @confidence(0.87)
 func generateWithFallback(prompt: string, userId: string) -> Result<Content, Error> {
@@ -196,13 +196,13 @@ func generateWithFallback(prompt: string, userId: string) -> Result<Content, Err
 
   // Try premium model if budget allows
   if budget.remaining > 2.00 {
-    @llm_call(model: "gpt-4o")
+    @llm_call(model: "gpt-4.5")
     return llm.generate(prompt)
   }
 
   // Fallback to cheaper model
   if budget.remaining > 0.15 {
-    @llm_call(model: "gpt-4o-mini")
+    @llm_call(model: "gpt-4.5-turbo")
     return llm.generate(prompt)
   }
 
@@ -248,9 +248,9 @@ function analyzeCosts(costs: CostData): string[] {
   const recommendations = [];
 
   // Check if using expensive models for simple tasks
-  if (costs.byModel["o1-pro"] > costs.total * 0.5) {
+  if (costs.byModel["o3"] > costs.total * 0.5) {
     recommendations.push(
-      "⚠️ 50%+ cost from o1-pro. Consider gpt-4o for simpler tasks."
+      "⚠️ 50%+ cost from o3. Consider gpt-4.5 for simpler tasks."
     );
   }
 
@@ -313,10 +313,10 @@ func monitorUserCosts(userId: string) -> void {
 
 ```agentic
 // Always try cheapest option first
-result = tryModel("gpt-4o-mini")
+result = tryModel("gpt-4.5-turbo")
 
 if result.confidence < threshold {
-  result = tryModel("gpt-4o")  // Escalate if needed
+  result = tryModel("gpt-4.5")  // Escalate if needed
 }
 ```
 
@@ -353,9 +353,9 @@ if result.confidence < threshold {
 - Cost: $250/day = $7,500/month
 
 **After Optimization:**
-- 70% simple queries → gpt-4o-mini ($0.15/1K)
-- 25% complex queries → gpt-4o ($2.50/1K)
-- 5% reasoning tasks → o1-pro ($15/1K)
+- 70% simple queries → gpt-4.5-turbo ($0.15/1K)
+- 25% complex queries → gpt-4.5 ($2.50/1K)
+- 5% reasoning tasks → o3 ($15/1K)
 - 30% cache hit rate (zero cost)
 - Cost: $50/day = $1,500/month
 

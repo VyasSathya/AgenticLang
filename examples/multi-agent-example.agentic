@@ -144,9 +144,9 @@ func onboardUser(userId: string) -> Result<User, OnboardingError> {
 @budget_limit(user_daily: 10.00, action: "throttle")
 @cost_optimized(
   models: {
-    cheap: "gpt-4o-mini",
-    standard: "gpt-4o",
-    premium: "o1-pro"
+    cheap: "gpt-4.5-turbo",
+    standard: "gpt-4.5",
+    premium: "o3"
   }
 )
 func generateSummary(document: string, userId: string) -> Result<Summary, Error> {
@@ -161,14 +161,14 @@ func generateSummary(document: string, userId: string) -> Result<Summary, Error>
   }
 
   // Start with cheapest model
-  @llm_call(model: "gpt-4o-mini", max_tokens: 500)
+  @llm_call(model: "gpt-4.5-turbo", max_tokens: 500)
   @cost_tracked(userId: userId, feature: "summarization")
   summary = llm.summarize(document)
 
   if summary.confidence < 0.85 {
     // Escalate to better model if needed and budget allows
     if budget.remaining > 2.00 {
-      @llm_call(model: "gpt-4o", max_tokens: 500)
+      @llm_call(model: "gpt-4.5", max_tokens: 500)
       summary = llm.summarize(document)
     }
   }
@@ -190,7 +190,7 @@ func generateSummary(document: string, userId: string) -> Result<Summary, Error>
 func moderateContent(content: UserContent) -> Result<ModerationDecision, Error> {
   // Input validation happens automatically via @input_guardrails
 
-  @llm_call(model: "gpt-4o")
+  @llm_call(model: "gpt-4.5")
   analysis = llm.analyzeContent(content.text)
 
   // Output validation happens automatically via @output_guardrails

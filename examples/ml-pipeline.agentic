@@ -88,20 +88,20 @@ func runInference(
 
   model = complexity match {
     "simple" -> {
-      @llm_call(model: "gpt-4o-mini", max_tokens: 100)
+      @llm_call(model: "gpt-4.5-turbo", max_tokens: 100)
       @cost_tracked(userId: userId, feature: "inference_simple")
-      "gpt-4o-mini"
+      "gpt-4.5-turbo"
     },
     "moderate" -> {
-      @llm_call(model: "gpt-4o", max_tokens: 500)
+      @llm_call(model: "gpt-4.5", max_tokens: 500)
       @cost_tracked(userId: userId, feature: "inference_moderate")
-      "gpt-4o"
+      "gpt-4.5"
     },
     "complex" -> {
-      @llm_call(model: "o1-pro", max_tokens: 2000)
+      @llm_call(model: "o3", max_tokens: 2000)
       @cost_tracked(userId: userId, feature: "inference_complex")
       @requires_approval(if: budget.remaining < 1.00)
-      "o1-pro"
+      "o3"
     }
   }
 
@@ -152,7 +152,7 @@ func batchInference(
 
   @parallel(maxConcurrency: 4)
   results = batched.map(batch => {
-    @llm_call(model: "gpt-4o-mini")
+    @llm_call(model: "gpt-4.5-turbo")
     @cost_tracked(userId: userId, feature: "batch_inference")
     return model.predictBatch(batch)
   })
@@ -202,7 +202,7 @@ func monitorModelPerformance() -> HealthStatus {
 // A/B testing for model comparison
 @ab_test(
   variants: {
-    control: "gpt-4o-mini",
+    control: "gpt-4.5-turbo",
     treatment: "fine-tuned-model-v2"
   },
   split: 0.5,  // 50/50 split

@@ -2,9 +2,9 @@
   "version": 1,
   "workspaceId": null,
   "rootPath": "C:\\Dev\\agentic-lang",
-  "lastFullScan": 1769124918784,
-  "fileCount": 35,
-  "indexableFileCount": 30,
+  "lastFullScan": 1769135078119,
+  "fileCount": 118,
+  "indexableFileCount": 95,
   "files": {
     ".gitignore": {
       "path": ".gitignore",
@@ -12,6 +12,34 @@
       "size": 114,
       "lastModified": 1769122405443.896,
       "language": "gitignore"
+    },
+    "ACHIEVEMENT_REPORT.md": {
+      "path": "ACHIEVEMENT_REPORT.md",
+      "hash": "837c6afcd6d2aaacb3915545378e18cdd98fde7710f93b84093205f1cc1784c4",
+      "size": 1290,
+      "lastModified": 1769133959397.1345,
+      "language": "markdown"
+    },
+    "COMMUNITY.md": {
+      "path": "COMMUNITY.md",
+      "hash": "cefe8e37e11defab922e2f953721142516afe7553ce9f61a1a3d426aa911672b",
+      "size": 5955,
+      "lastModified": 1769131593460.3508,
+      "language": "markdown"
+    },
+    "COMPLETE_VICTORY.md": {
+      "path": "COMPLETE_VICTORY.md",
+      "hash": "05232627a949f93c4d4f508df04cb20c15d89915da63ae702fb0bc788f2afefb",
+      "size": 15582,
+      "lastModified": 1769134749745.1267,
+      "language": "markdown"
+    },
+    "COMPREHENSIVE_BUILD_REPORT.md": {
+      "path": "COMPREHENSIVE_BUILD_REPORT.md",
+      "hash": "9b83c4c62265bc0544940928e2ee9f0133d781f328265074c8a9db6d72005051",
+      "size": 20867,
+      "lastModified": 1769132419054.8936,
+      "language": "markdown"
     },
     "CONTRIBUTING.md": {
       "path": "CONTRIBUTING.md",
@@ -27,6 +55,34 @@
       "lastModified": 1769124365894.2773,
       "language": "markdown"
     },
+    "FINAL_STATUS_REPORT.md": {
+      "path": "FINAL_STATUS_REPORT.md",
+      "hash": "dc94db57fb2bd1be2b7a4580c5dc79fc50ecc42980dfbbf1c4aa856e7f9f8531",
+      "size": 20786,
+      "lastModified": 1769133178517.7373,
+      "language": "markdown"
+    },
+    "IMPLEMENTATION_SUMMARY.md": {
+      "path": "IMPLEMENTATION_SUMMARY.md",
+      "hash": "a1efce35d4a6ad59be007efbbfb32d4d5f48e0cf7c9a0ec6df1560168d8df905",
+      "size": 11018,
+      "lastModified": 1769132044658.5396,
+      "language": "markdown"
+    },
+    "IMPROVEMENTS.md": {
+      "path": "IMPROVEMENTS.md",
+      "hash": "9a8f63cbb265520f90d557ee66c3c3c5f1fcadc042cff1aeb998d62d8db06769",
+      "size": 8406,
+      "lastModified": 1769126979459.9873,
+      "language": "markdown"
+    },
+    "LAUNCH_GUIDE.md": {
+      "path": "LAUNCH_GUIDE.md",
+      "hash": "007e700a7ee4f03a5b0298de152cdb7671a1e782d5999fa2a543c20c64ec53ae",
+      "size": 11200,
+      "lastModified": 1769132129609.5098,
+      "language": "markdown"
+    },
     "LICENSE": {
       "path": "LICENSE",
       "hash": "26e64b6302309568104fe7689e6054587b4014dcfdb6b80e0bcf18c392549dcf",
@@ -34,11 +90,18 @@
       "lastModified": 1769122963649.2307,
       "language": null
     },
+    "MASTER_SUMMARY.md": {
+      "path": "MASTER_SUMMARY.md",
+      "hash": "86415d821d5bb363159072e302d879a0265a863e56167c3de9ef2101af868817",
+      "size": 14723,
+      "lastModified": 1769133415229.7644,
+      "language": "markdown"
+    },
     "package.json": {
       "path": "package.json",
-      "hash": "4aedcdc8b4e9b3f379c15bf0ee4043374e7b5104753581c9b7821ef4a694a2c8",
-      "size": 1148,
-      "lastModified": 1769122396314.3735,
+      "hash": "1fb6b38cde616481c5d1c251094f6acf130777f402ab5c92f16113606ebf3ecd",
+      "size": 1436,
+      "lastModified": 1769131350795.834,
       "language": "json"
     },
     "PROJECT_COMPLETE.md": {
@@ -62,12 +125,61 @@
       "lastModified": 1769124442473.5425,
       "language": null
     },
+    "PUBLISHING_GUIDE.md": {
+      "path": "PUBLISHING_GUIDE.md",
+      "hash": "84bb2650ec784bbc2906d4f2addfcf33badef908d28cc41a1c43376ff6b698e2",
+      "size": 9899,
+      "lastModified": 1769135065845.5376,
+      "language": "markdown"
+    },
+    "QUICKSTART.md": {
+      "path": "QUICKSTART.md",
+      "hash": "6a1cb4c2803ea9bc649555e02b357a5767a34a9efcdf76dfd3e46fa089ac4f96",
+      "size": 5698,
+      "lastModified": 1769129707404.6985,
+      "language": "markdown"
+    },
     "README.md": {
       "path": "README.md",
       "hash": "fc62c4e9255b0f5fc242c1d2f070f706eb7986ec69e8baced2965ef93b6ea969",
       "size": 5658,
       "lastModified": 1769122409990.3672,
       "language": "markdown"
+    },
+    "README_ENHANCED.md": {
+      "path": "README_ENHANCED.md",
+      "hash": "f19e13d11183903ecc65be170bffd4e711e6e4d1e63e3121040d332049bd2f47",
+      "size": 8813,
+      "lastModified": 1769133273792.2915,
+      "language": "markdown"
+    },
+    "READY_TO_LAUNCH.txt": {
+      "path": "READY_TO_LAUNCH.txt",
+      "hash": "c538f59b730218fdce0dee1e140ef56fb195e60e08913166b704e50d06ba8c06",
+      "size": 4328,
+      "lastModified": 1769134762011.8352,
+      "language": null
+    },
+    "REFACTOR_PLAN.md": {
+      "path": "REFACTOR_PLAN.md",
+      "hash": "a7f90732a2a2a494ab42605394238da363aed4c0310ea722851df7c54e72817c",
+      "size": 4970,
+      "lastModified": 1769125398963.6929,
+      "language": "markdown"
+    },
+    "ROADMAP.md": {
+      "path": "ROADMAP.md",
+      "hash": "18d3e6b7adfafb7b7f4f7e1c3c0b002c8d3337f002232cb2f3f39aa5f580574d",
+      "size": 5816,
+      "lastModified": 1769131549666.5693,
+      "language": "markdown"
+    },
+    "stryker.conf.json": {
+      "path": "stryker.conf.json",
+      "hash": "07d5df2473879a4c9183fcefc3533660e8175dbf62d215af6c02ec8930a4f360",
+      "size": 741,
+      "lastModified": 1769131352346.0654,
+      "language": "json"
     },
     "SUMMARY.md": {
       "path": "SUMMARY.md",
@@ -83,12 +195,33 @@
       "lastModified": 1769122400744.498,
       "language": "json"
     },
+    "tsconfig.lsp.json": {
+      "path": "tsconfig.lsp.json",
+      "hash": "9d35b3db794bf42e41651d948e210d31f3b3b3b9ce4012c03563616cc1f2707d",
+      "size": 518,
+      "lastModified": 1769131354471.66,
+      "language": "json"
+    },
+    "ULTIMATE_ACHIEVEMENT.md": {
+      "path": "ULTIMATE_ACHIEVEMENT.md",
+      "hash": "12cc114f2b9b9e4b45e7901af036f76392c2b8cedc0ef26e88fba40c48871cd3",
+      "size": 2000,
+      "lastModified": 1769134054368.992,
+      "language": "markdown"
+    },
     "vitest.config.ts": {
       "path": "vitest.config.ts",
       "hash": "f3a73934eb0ad2beaa842a0be1c0b15ca8a4525cf571f6067aca2884f0ec6e45",
       "size": 375,
       "lastModified": 1769123114265.54,
       "language": "typescript"
+    },
+    "website/docusaurus.config.js": {
+      "path": "website/docusaurus.config.js",
+      "hash": "6c6c8735411a0a6de2d7c36b38a450c6ab03def7d4b880475b8c7b2ad7fda890",
+      "size": 3738,
+      "lastModified": 1769131542654.2234,
+      "language": "javascript"
     },
     "vscode-extension/language-configuration.json": {
       "path": "vscode-extension/language-configuration.json",
@@ -118,11 +251,18 @@
       "lastModified": 1769122736163.4526,
       "language": "json"
     },
+    "video-scripts/001-agentic-in-100-seconds.md": {
+      "path": "video-scripts/001-agentic-in-100-seconds.md",
+      "hash": "122f8e4240696f94940d5c0c04991a5488b0be547d2060364daea22acaab5003",
+      "size": 4740,
+      "lastModified": 1769133937164.5579,
+      "language": "markdown"
+    },
     "tests/parser.test.ts": {
       "path": "tests/parser.test.ts",
-      "hash": "53300c031f2f5ae4f3fd6da88b4495ece39ffe385bb9b0e402b95b57b3b43a2b",
-      "size": 3247,
-      "lastModified": 1769123149161.4478,
+      "hash": "40d0e6d0ea6786be25c5f8cbcf05853b449088fc0ac5f19057ba1fe020f9862f",
+      "size": 8271,
+      "lastModified": 1769126312770.4011,
       "language": "typescript"
     },
     "tests/transpiler.test.ts": {
@@ -131,6 +271,34 @@
       "size": 2019,
       "lastModified": 1769123152030.5679,
       "language": "typescript"
+    },
+    "stdlib/http/client.agentic": {
+      "path": "stdlib/http/client.agentic",
+      "hash": "cf6ef981b24669877a2112d2b0d9f812558e2b2df8b070eed6aeb8644ec0fe86",
+      "size": 4310,
+      "lastModified": 1769132676722.495,
+      "language": null
+    },
+    "stdlib/file/io.agentic": {
+      "path": "stdlib/file/io.agentic",
+      "hash": "7f8068db3b043e27003644f6b6730f15decc1f96b56b04f5a1e3e2faa36d1571",
+      "size": 4831,
+      "lastModified": 1769132924243.659,
+      "language": null
+    },
+    "stdlib/database/pool.agentic": {
+      "path": "stdlib/database/pool.agentic",
+      "hash": "af0cdc6459bfbe9759069656960b273aae15437167409fc01217bbf7a69396e5",
+      "size": 5660,
+      "lastModified": 1769132919769.7244,
+      "language": null
+    },
+    "stdlib/async/promise.agentic": {
+      "path": "stdlib/async/promise.agentic",
+      "hash": "0e315bd83d605bbcfcde97c5fd1ca416085002a56829d33d5ca391d60943b625",
+      "size": 5186,
+      "lastModified": 1769132678864.6123,
+      "language": null
     },
     "src/cli.ts": {
       "path": "src/cli.ts",
@@ -146,6 +314,20 @@
       "lastModified": 1769123259160.827,
       "language": "typescript"
     },
+    "src/repl.ts": {
+      "path": "src/repl.ts",
+      "hash": "4c48bfe9699150521f7374aa68e3a93edc2bf8a6c5f87537a43ed3602931cc34",
+      "size": 8946,
+      "lastModified": 1769129911203.1597,
+      "language": "typescript"
+    },
+    "src/types-extended.ts": {
+      "path": "src/types-extended.ts",
+      "hash": "1d63e3f7574b036cc004b71a437449c2576c2398008bcbe4b787e0b9a925baf7",
+      "size": 5355,
+      "lastModified": 1769132205237.0647,
+      "language": "typescript"
+    },
     "src/types.ts": {
       "path": "src/types.ts",
       "hash": "dbbee1086dde8996791e249a693a7fcf88c864aa827807464f68f2b0302a293a",
@@ -153,46 +335,186 @@
       "lastModified": 1769122461193.5195,
       "language": "typescript"
     },
+    "src/wasm/Cargo.toml": {
+      "path": "src/wasm/Cargo.toml",
+      "hash": "43cea94b80213c3a555d53f05aac44f0d44882360e952f5d77dbc8d702fbf576",
+      "size": 619,
+      "lastModified": 1769133771190.303,
+      "language": "toml"
+    },
+    "src/wasm/compiler.rs": {
+      "path": "src/wasm/compiler.rs",
+      "hash": "f921fa6d329f037fe59b232b82d500a1438b75d0ea5b1ff462bc6df36a260923",
+      "size": 6349,
+      "lastModified": 1769133768917.2654,
+      "language": "rust"
+    },
+    "src/verification/z3-engine.ts": {
+      "path": "src/verification/z3-engine.ts",
+      "hash": "232e1f813122100b70249641a2f68c0f983d95194bb82cab5ef4979e15f31d1c",
+      "size": 9417,
+      "lastModified": 1769131718579.3596,
+      "language": "typescript"
+    },
+    "src/runtime/agents.ts": {
+      "path": "src/runtime/agents.ts",
+      "hash": "03c8390859f293c1a358f70735a6657a0bd3ee1d6695483c6c9eabee0c5497ad",
+      "size": 8987,
+      "lastModified": 1769131869501.5908,
+      "language": "typescript"
+    },
     "src/runtime/index.ts": {
       "path": "src/runtime/index.ts",
-      "hash": "c488d0920de161caa6aeb5e5e52ad7cd6ecd32dae7f8258b3f38acc8741dfa87",
-      "size": 5181,
-      "lastModified": 1769122591557.6057,
+      "hash": "0f31f8a2e55bb39acad922fcd1fcfabbdd3ab8810c122de8b995a6209ab0c2c0",
+      "size": 9828,
+      "lastModified": 1769126230906.229,
+      "language": "typescript"
+    },
+    "src/refinements/refinement-types.ts": {
+      "path": "src/refinements/refinement-types.ts",
+      "hash": "af7e41c275277afefae2621201d7b209eabbc75569b6fa540d5dbefd55129636",
+      "size": 8974,
+      "lastModified": 1769132931094.1836,
+      "language": "typescript"
+    },
+    "src/property-tests/generator-enhanced.ts": {
+      "path": "src/property-tests/generator-enhanced.ts",
+      "hash": "3bc1704e79c2fc37fbbea1f327098bc1dcef9fef3c0c2af90131a4e0b9b62a57",
+      "size": 7729,
+      "lastModified": 1769132276687.7559,
       "language": "typescript"
     },
     "src/property-tests/generator.ts": {
       "path": "src/property-tests/generator.ts",
-      "hash": "cc42a3e247e6005c3893910a8a0499de1fd002422edc7d5bdc606aa519bc4a20",
-      "size": 4997,
-      "lastModified": 1769122674937.5044,
+      "hash": "2f5134eb3b97bb3c90ae74a7904c4312fa1aa11fd4bf63fa117d9eb31bd7b8d1",
+      "size": 11188,
+      "lastModified": 1769132203052.3694,
       "language": "typescript"
     },
     "src/parser/lexer.ts": {
       "path": "src/parser/lexer.ts",
-      "hash": "0476594d04ff977d0a0a1a8b956a25c4fdcebb725f95931ee267d50d309d497e",
-      "size": 7775,
-      "lastModified": 1769122467170.3584,
+      "hash": "3ce6ac7e2321c4bc8b6d61f6518cdb47d96be4e09099b9dd50e337adaf9e78e0",
+      "size": 8045,
+      "lastModified": 1769126563028.7532,
+      "language": "typescript"
+    },
+    "src/parser/parser-enhanced.ts": {
+      "path": "src/parser/parser-enhanced.ts",
+      "hash": "15c887d404c4e08b23d9f33b3d8d28cc5b951708e0561528834ab2e8a5ab6056",
+      "size": 6694,
+      "lastModified": 1769125351199.2344,
       "language": "typescript"
     },
     "src/parser/parser.ts": {
       "path": "src/parser/parser.ts",
-      "hash": "ea928f282c829d0636d5adea23d1728da5e49e224ab3a4817512f19462d2d201",
-      "size": 10592,
-      "lastModified": 1769123890201.016,
+      "hash": "ee5976dcd0bc4fad7621d4e7486c18bf03501b5c28d743e9ba0d0d89baf9dbcc",
+      "size": 16127,
+      "lastModified": 1769126581637.4382,
+      "language": "typescript"
+    },
+    "src/lsp/server.ts": {
+      "path": "src/lsp/server.ts",
+      "hash": "e167f9dd6102e2a6124dad7fbfb376457b2b28ec5414e78a6fa9ada0af74c10f",
+      "size": 4739,
+      "lastModified": 1769132207430.475,
+      "language": "typescript"
+    },
+    "src/lean4/exporter.ts": {
+      "path": "src/lean4/exporter.ts",
+      "hash": "1eb91f516f34de478931c703f52d87d7b197f6a146ebe2c1284a9ec357c77cdf",
+      "size": 5125,
+      "lastModified": 1769133045388.9543,
       "language": "typescript"
     },
     "src/generator/typescript-generator.ts": {
       "path": "src/generator/typescript-generator.ts",
-      "hash": "c12d58c9d226f374fa04eaa176b11cc8011718f25daf5305e075b2a9734a024d",
-      "size": 6165,
-      "lastModified": 1769122586495.9885,
+      "hash": "14046d7b314c776b811d7a51e97d87d6c5c25b856c797b35cb21c11342ad3ccd",
+      "size": 11961,
+      "lastModified": 1769126181055.8582,
       "language": "typescript"
+    },
+    "src/effects/effect-system.ts": {
+      "path": "src/effects/effect-system.ts",
+      "hash": "f3fd09762f37e43f3f9d6598ebdf15714bf62989e10f62423b039d1363657624",
+      "size": 7436,
+      "lastModified": 1769132674546.1335,
+      "language": "typescript"
+    },
+    "src/diagnostics/diagnostic.ts": {
+      "path": "src/diagnostics/diagnostic.ts",
+      "hash": "81ffc80bf46baec9cdbbf76bd37ef87f39080275e91e309bfb2acbd1b1ce82b2",
+      "size": 4556,
+      "lastModified": 1769131214031.4065,
+      "language": "typescript"
+    },
+    "src/diagnostics/formatter.ts": {
+      "path": "src/diagnostics/formatter.ts",
+      "hash": "d55e7a101766a3d4f4149083238502699232c5d88a6089c90088cd98be89bc89",
+      "size": 9587,
+      "lastModified": 1769131216209.6907,
+      "language": "typescript"
+    },
+    "scripts/build.js": {
+      "path": "scripts/build.js",
+      "hash": "98173c234fa850c50b5aa53bf9da471fd7e6d078d5fe3f9bf53efd843b5798b1",
+      "size": 1332,
+      "lastModified": 1769125365752.6626,
+      "language": "javascript"
+    },
+    "scripts/validate-confidence-mutation.ts": {
+      "path": "scripts/validate-confidence-mutation.ts",
+      "hash": "b63cfe7ba33af196b127c39875efe73925c64c7edf641f58323fb72f3cdbd273",
+      "size": 3994,
+      "lastModified": 1769132040159.6174,
+      "language": "typescript"
+    },
+    "registry/package-registry.ts": {
+      "path": "registry/package-registry.ts",
+      "hash": "e4cb9b62b6c8a9bfc47116b6e9c84a823fede62068ec6a0878716a18d2cf674b",
+      "size": 9078,
+      "lastModified": 1769134452204.2017,
+      "language": "typescript"
+    },
+    "playground/index.html": {
+      "path": "playground/index.html",
+      "hash": "78d9cf41b82c58538cac869362e16a5c38baa479302e4dad87e8daf48a628458",
+      "size": 6058,
+      "lastModified": 1769132670256.9211,
+      "language": "html"
+    },
+    "playground/playground.js": {
+      "path": "playground/playground.js",
+      "hash": "c4ea365a57115401c246409c05399d29129bc69237c2f665787d2c3a23c942da",
+      "size": 8370,
+      "lastModified": 1769132672408.592,
+      "language": "javascript"
+    },
+    "examples/advanced-features.agentic": {
+      "path": "examples/advanced-features.agentic",
+      "hash": "16e3f1d95cb4eaade49ee290ee13c94295e6bd66cedaf1727d54b9f80450691f",
+      "size": 2754,
+      "lastModified": 1769126793064.3843,
+      "language": null
+    },
+    "examples/annotations.agentic": {
+      "path": "examples/annotations.agentic",
+      "hash": "d75c344bcfd60e5b80c6a7fb2ad90cfe0c49169c45a5459b88ce4949e38b9e35",
+      "size": 940,
+      "lastModified": 1769126768961.8293,
+      "language": null
     },
     "examples/auth.agentic": {
       "path": "examples/auth.agentic",
       "hash": "3095310d2262fa7d0c5b850aa0ae8b3e32a9a739909473f5904968fb60e65bd0",
       "size": 1668,
       "lastModified": 1769122648188.7034,
+      "language": null
+    },
+    "examples/enterprise-example.agentic": {
+      "path": "examples/enterprise-example.agentic",
+      "hash": "761a1ed51c6c58f146f7dbba095b4a58a7c925893f48ffbbdb522043a1d19120",
+      "size": 9825,
+      "lastModified": 1769133939356.9058,
       "language": null
     },
     "examples/minimal.agentic": {
@@ -209,11 +531,81 @@
       "lastModified": 1769124076694.3767,
       "language": "typescript"
     },
+    "examples/ml-pipeline.agentic": {
+      "path": "examples/ml-pipeline.agentic",
+      "hash": "78703fc646666a50330a22ec6d5f5dde3b822861c046aaf1c8459518efe98735",
+      "size": 10133,
+      "lastModified": 1769134461398.123,
+      "language": null
+    },
+    "examples/multi-agent-example.agentic": {
+      "path": "examples/multi-agent-example.agentic",
+      "hash": "15a528611e9688fcf8de37f3b44db31303043bac3c05f403bef54fcd24fde19d",
+      "size": 5693,
+      "lastModified": 1769131871642.7812,
+      "language": null
+    },
+    "examples/onboarding-tutorial.agentic": {
+      "path": "examples/onboarding-tutorial.agentic",
+      "hash": "b90b06492b24f873666ae235df75bb45eb28ee1d996c08cbd258b64312dbbd89",
+      "size": 7179,
+      "lastModified": 1769129865926.8604,
+      "language": null
+    },
+    "examples/production-api.agentic": {
+      "path": "examples/production-api.agentic",
+      "hash": "fb567423f3da317f6ae22b2509a9b859eb450e5538cb87f0c95ee58e344e292d",
+      "size": 8072,
+      "lastModified": 1769133049871.5623,
+      "language": null
+    },
+    "examples/real-world-chatbot.agentic": {
+      "path": "examples/real-world-chatbot.agentic",
+      "hash": "9e2cd3af1609f2795fab809925e2c965c83fcbe3a33d76eecd1534a111102da4",
+      "size": 9391,
+      "lastModified": 1769133780105.3694,
+      "language": null
+    },
+    "examples/result-handling.agentic": {
+      "path": "examples/result-handling.agentic",
+      "hash": "92e0845f963f7afce95871f6d8abb550cbf5fc2e9df7e10839bb67c0b127f314",
+      "size": 808,
+      "lastModified": 1769126845386.0576,
+      "language": null
+    },
     "examples/runtime.ts": {
       "path": "examples/runtime.ts",
       "hash": "5d1fc91ec6a563f00d82662d0ae812f7ab5b8d52caac239a2bb22a0919567bfd",
       "size": 586,
       "lastModified": 1769124272645.2302,
+      "language": "typescript"
+    },
+    "examples/showcase.agentic": {
+      "path": "examples/showcase.agentic",
+      "hash": "f71f64ea45b6825e903fdc8fc9bfda2acd5ba2282d2468c9a90d846ce4f9a84e",
+      "size": 344,
+      "lastModified": 1769126869641.4597,
+      "language": null
+    },
+    "examples/showcase.ts": {
+      "path": "examples/showcase.ts",
+      "hash": "fb701065c25ed50119d985c889ecc8fb52d225349b85d9c27c556f00fabab4b1",
+      "size": 699,
+      "lastModified": 1769126873794.8328,
+      "language": "typescript"
+    },
+    "examples/simple-test.agentic": {
+      "path": "examples/simple-test.agentic",
+      "hash": "897f9bbc2e0d772d822cacec5f6f396c0477f14acb06eed95cc00f145d0e071b",
+      "size": 65,
+      "lastModified": 1769126745290.2473,
+      "language": null
+    },
+    "examples/simple-test.ts": {
+      "path": "examples/simple-test.ts",
+      "hash": "16cccb4ecba2ed2c4fad72c2f700ede0f266d0aba5ef457c2479997b1ca171aa",
+      "size": 164,
+      "lastModified": 1769126748682.0657,
       "language": "typescript"
     },
     "examples/simple.agentic": {
@@ -222,6 +614,34 @@
       "size": 436,
       "lastModified": 1769122652968.6252,
       "language": null
+    },
+    "examples/test2.agentic": {
+      "path": "examples/test2.agentic",
+      "hash": "0ca162ef406461b8dcfc80e9102fc020b7eef1fd441e3b20c2f5262471d7707e",
+      "size": 85,
+      "lastModified": 1769126805164.6538,
+      "language": null
+    },
+    "examples/test2.ts": {
+      "path": "examples/test2.ts",
+      "hash": "7bfa750e7026809c8a5aa5b7165e47824c0c04a366f187dc52120eadcae255e9",
+      "size": 281,
+      "lastModified": 1769126808612.1711,
+      "language": "typescript"
+    },
+    "examples/test3.agentic": {
+      "path": "examples/test3.agentic",
+      "hash": "16b20a82ec28ff4a65e6f88da1e68aa144d8fde3a12fce870adbaef9c4a807c7",
+      "size": 67,
+      "lastModified": 1769126818188.651,
+      "language": null
+    },
+    "examples/test3.ts": {
+      "path": "examples/test3.ts",
+      "hash": "2e767204ade0101a1ec10a60d7b6727ce2826ee602c99823c74393d4e331c61a",
+      "size": 253,
+      "lastModified": 1769126821700.9382,
+      "language": "typescript"
     },
     "docs/QUICK_START.md": {
       "path": "docs/QUICK_START.md",
@@ -244,12 +664,173 @@
       "lastModified": 1769122889591.2402,
       "language": "markdown"
     },
+    "docs/tutorials/01-hello-world.md": {
+      "path": "docs/tutorials/01-hello-world.md",
+      "hash": "7cd4652c241a80634076abaad50caa8d6c96ec62ea722b0b091d6ec5fdc15e89",
+      "size": 3319,
+      "lastModified": 1769131720710.1267,
+      "language": "markdown"
+    },
+    "docs/tutorials/02-fundamentals.md": {
+      "path": "docs/tutorials/02-fundamentals.md",
+      "hash": "1fe582881ee5e5dc093c7ff682fc063ddbe95077d1ae88e19d125321982e0553",
+      "size": 6311,
+      "lastModified": 1769131873793.91,
+      "language": "markdown"
+    },
+    "docs/tutorials/03-intermediate.md": {
+      "path": "docs/tutorials/03-intermediate.md",
+      "hash": "8b8baf3f38dfa615b686ccc13d6d091e9546a249dcf5766e38d975f8a81413ed",
+      "size": 10751,
+      "lastModified": 1769132928805.729,
+      "language": "markdown"
+    },
+    "docs/tutorials/04-advanced.md": {
+      "path": "docs/tutorials/04-advanced.md",
+      "hash": "e91ae57bf55874a028b95071998a1f09f9be273a508c3e99e66364bb9985db4f",
+      "size": 15685,
+      "lastModified": 1769133773434.476,
+      "language": "markdown"
+    },
+    "docs/tutorials/05-expert.md": {
+      "path": "docs/tutorials/05-expert.md",
+      "hash": "417986db60cd9e423739190479cbb52eadb26b75e8be3984485646ba5c05ec34",
+      "size": 18195,
+      "lastModified": 1769133775642.4739,
+      "language": "markdown"
+    },
+    "docs/errors/A005.md": {
+      "path": "docs/errors/A005.md",
+      "hash": "b8725b821676537a7067030a41167281bb2f28ed59431fce9ea16686402e778e",
+      "size": 2719,
+      "lastModified": 1769131547308.3303,
+      "language": "markdown"
+    },
+    "docs/errors/P002.md": {
+      "path": "docs/errors/P002.md",
+      "hash": "4b64c2d26abd20eb519801d0f0df6a8480f6e6587259be3a150ba7b9c74b2a3a",
+      "size": 1050,
+      "lastModified": 1769131544948.5405,
+      "language": "markdown"
+    },
+    "docs/cookbook/README.md": {
+      "path": "docs/cookbook/README.md",
+      "hash": "60ffbab079b7467cf0318cd270d463be04811bc50c8ca24a8c381bbd4f20a811",
+      "size": 3265,
+      "lastModified": 1769132042456.6125,
+      "language": "markdown"
+    },
+    "docs/cookbook/testing/property-based.md": {
+      "path": "docs/cookbook/testing/property-based.md",
+      "hash": "3be4f5c32c161cb9e536f25be30a0edb4b55c5bf87b9d6cb5494f146b2316dad",
+      "size": 6958,
+      "lastModified": 1769132921931.833,
+      "language": "markdown"
+    },
+    "docs/cookbook/patterns/dependency-injection.md": {
+      "path": "docs/cookbook/patterns/dependency-injection.md",
+      "hash": "5ed8c3e9db11ceabf4b6760c6b5712980fa8c4bd69eda323499de77e57eb132b",
+      "size": 10660,
+      "lastModified": 1769134454365.631,
+      "language": "markdown"
+    },
+    "docs/cookbook/patterns/self-healing.md": {
+      "path": "docs/cookbook/patterns/self-healing.md",
+      "hash": "0bd0de0a8525ee561c2cf8cf62fe9c0dc497940d1fa84788629461e3605177a0",
+      "size": 9899,
+      "lastModified": 1769134465951.7021,
+      "language": "markdown"
+    },
+    "docs/cookbook/multi-agent/message-passing.md": {
+      "path": "docs/cookbook/multi-agent/message-passing.md",
+      "hash": "210ab2cd8df018d6fa1e5694ac482145ef548740647de6982971e1683c51e63d",
+      "size": 8396,
+      "lastModified": 1769133047586.714,
+      "language": "markdown"
+    },
+    "docs/cookbook/error-handling/circuit-breaker.md": {
+      "path": "docs/cookbook/error-handling/circuit-breaker.md",
+      "hash": "d2f92917adf6ae26c05a04827ab602bec4539c5ae5c0e8d3e66c050ba99bb3f3",
+      "size": 9869,
+      "lastModified": 1769134463705.3499,
+      "language": "markdown"
+    },
+    "docs/cookbook/error-handling/graceful-degradation.md": {
+      "path": "docs/cookbook/error-handling/graceful-degradation.md",
+      "hash": "cc2acb71626a719761c50ca2f5eb904d681ab9175e34147f38eac0595cf8a5d6",
+      "size": 2968,
+      "lastModified": 1769132037808.13,
+      "language": "markdown"
+    },
+    "docs/cookbook/confidence/tracking-uncertainty.md": {
+      "path": "docs/cookbook/confidence/tracking-uncertainty.md",
+      "hash": "513d9b74064b7e666633d5b6a5e4d0b24917fc3ea6167274a457dc77cefc60f1",
+      "size": 5880,
+      "lastModified": 1769132926468.2092,
+      "language": "markdown"
+    },
+    "docs/cookbook/ai/cost-optimization.md": {
+      "path": "docs/cookbook/ai/cost-optimization.md",
+      "hash": "70e03d997fd800d14ff0b0b91b4d052c03736f54e6c53463f71aabe28f00924a",
+      "size": 9394,
+      "lastModified": 1769134456694.7488,
+      "language": "markdown"
+    },
+    "blog/001-introducing-agentic.md": {
+      "path": "blog/001-introducing-agentic.md",
+      "hash": "d35c03180b9fe379cafaf1a3576ee98594564198c70d2f5b070c968e62a57f1c",
+      "size": 9594,
+      "lastModified": 1769133777926.412,
+      "language": "markdown"
+    },
+    "blog/002-confidence-driven-development.md": {
+      "path": "blog/002-confidence-driven-development.md",
+      "hash": "989e3bb08da1447ee315319646a8bf307cef1f952252f4a5c9ce87aacdf1a175",
+      "size": 11982,
+      "lastModified": 1769133935021.9365,
+      "language": "markdown"
+    },
+    "blog/003-formal-verification.md": {
+      "path": "blog/003-formal-verification.md",
+      "hash": "fd5d080aa959ca9e6407df3f879c2ab32af554f1e2a2e9afddf928beafc76bf2",
+      "size": 9500,
+      "lastModified": 1769134458993.6074,
+      "language": "markdown"
+    },
+    "blog/004-multi-agent-production.md": {
+      "path": "blog/004-multi-agent-production.md",
+      "hash": "70ef5a8380e132430a8b1175adb373005c552a084a1a48c9235cd19a38a66ec3",
+      "size": 9912,
+      "lastModified": 1769134531442.2485,
+      "language": "markdown"
+    },
     "bin/agentic.js": {
       "path": "bin/agentic.js",
       "hash": "81eb7eab42f925fa69114cdff9578302a3f819af35ac89dae7272191f334c1a9",
       "size": 49,
       "lastModified": 1769122600785.392,
       "language": "javascript"
+    },
+    "benchmarks/compilation.bench.ts": {
+      "path": "benchmarks/compilation.bench.ts",
+      "hash": "c389b2acba3b5c58f3cc3d0ee2945fb7d3863fa43f6dff97e91dedde6b5865e9",
+      "size": 2443,
+      "lastModified": 1769131722870.622,
+      "language": "typescript"
+    },
+    ".vibetasks/workspace.json": {
+      "path": ".vibetasks/workspace.json",
+      "hash": "05ab0602ecb0fcb9be3a5cab7d3d59a8f2af5bb8aa16309c2d75da977d046d8a",
+      "size": 175,
+      "lastModified": 1769128240609.9275,
+      "language": "json"
+    },
+    ".github/workflows/ci.yml": {
+      "path": ".github/workflows/ci.yml",
+      "hash": "2a7ff23ffae070b6cad466b65b215ad2c1946542b2d5740bf350af9311c1a484",
+      "size": 5329,
+      "lastModified": 1769132035655.643,
+      "language": "yaml"
     }
   }
 }
