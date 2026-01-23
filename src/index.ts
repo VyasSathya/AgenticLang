@@ -6,7 +6,7 @@
 export { Lexer, TokenType, type Token } from './parser/lexer';
 export { Parser } from './parser/parser';
 export { TypeScriptGenerator } from './generator/typescript-generator';
-export { PropertyTestGenerator } from './property-tests/generator';
+export { EnhancedPropertyTestGenerator as PropertyTestGenerator } from './property-tests/generator-enhanced';
 export {
   AgenticRuntime,
   Result,
@@ -26,7 +26,7 @@ export * from './types';
 // Main transpile function
 import { Parser as ParserClass } from './parser/parser';
 import { TypeScriptGenerator as TSGenerator } from './generator/typescript-generator';
-import { PropertyTestGenerator as PropTestGen } from './property-tests/generator';
+import { EnhancedPropertyTestGenerator as PropTestGen } from './property-tests/generator-enhanced';
 
 export async function transpile(
   source: string,
