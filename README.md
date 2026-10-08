@@ -1,195 +1,74 @@
-# Agentic Programming Language
+# Agentic
 
-> An AI-native programming language with uncertainty, incremental correctness, and verification as first-class citizens.
+A language-design and compiler prototype exploring how AI-written programs can express confidence, incomplete implementation stages, context requirements, and verification intent. The repository includes an experimental TypeScript transpiler, runtime helpers, language examples, and research notes.
 
-## Overview
+## Start with the compiler source
 
-Agentic is a revolutionary programming language designed specifically for AI agents. It addresses the core challenges AI faces when writing code:
-- **Uncertainty is explicit** - Confidence scores on all operations
-- **Incremental development** - Code valid at every stage (@stub, @partial, @complete)
-- **Rich error context** - Errors are structured data with recovery suggestions
-- **Self-verification** - Property-based tests auto-generate from code
-- **Session continuity** - Structured handoffs prevent context loss
+The compiler flow in [src/cli.ts](src/cli.ts) reads an `.agentic` file, passes it through the handwritten recursive-descent [parser](src/parser/parser.ts), and emits TypeScript through the [generator](src/generator/typescript-generator.ts).
 
-## Quick Start
+Install the declared Node.js dependencies, then try the source CLI:
 
-```bash
-# Install dependencies
+```sh
 npm install
-
-# Build the transpiler
-npm run build
-
-# Compile an .agentic file to TypeScript
-./bin/agentic.js compile examples/auth.agentic --output examples/auth.ts
-
-# Watch mode
-./bin/agentic.js watch examples/
+npm run dev -- compile examples/minimal.agentic --output examples/minimal.ts
 ```
 
-## Example Code
+The equivalent build path is:
+
+```sh
+npm run build
+node dist/cli.js compile examples/minimal.agentic --output examples/minimal.ts
+```
+
+The package also declares `npm test` using Vitest. Build, test, and example execution results have not been validated as part of this documentation review.
+
+**Entry-point distinction:** [bin/agentic.js](bin/agentic.js), the package-facing CLI, currently provides learning/example commands and a placeholder `compile` action. It does not perform the source compiler's transformation. Use the source or built `src/cli.ts` route above when evaluating compilation.
+
+## Syntax to explore
+
+The examples use function declarations, type annotations, result values, and metadata such as confidence and development stages:
 
 ```agentic
-@confidence(0.90)
-@needs(database: Database, jwt_secret: string)
-func authenticate(token: string) -> Result<User, AuthError> {
-    // Validate input
-    @confident(0.99)
-    if token.isEmpty() {
-        return Err(AuthError.MISSING_TOKEN)
-    }
-
-    // Decode with uncertainty
-    @uncertain("Edge case: malformed but decodable tokens?")
-    decoded = jwt.decode(token, jwt_secret) match {
-        Ok(payload) -> payload,
-        Err(e) -> {
-            @context {
-                what_failed: "JWT decode",
-                suggestions: ["Check token format", "Verify JWT_SECRET"]
-            }
-            return Err(AuthError.INVALID_TOKEN)
-        }
-    }
-
-    return Ok(User.fromDict(decoded))
+@confidence(0.95)
+@complete
+func greet(name: string) -> string {
+    return "Hello, " + name
 }
-
-// Auto-generated property tests
-@property("rejects empty tokens")
-@property("rejects invalid tokens")
-@property("accepts valid tokens")
 ```
 
-## Language Features
+See [examples/](examples/) for the language's intended usage and [docs/SPECIFICATION.md](docs/SPECIFICATION.md) for its design. Example presence is not a guarantee that every syntax form or verification feature is supported by the current compiler.
 
-### 1. Confidence Annotations
-- `@confidence(0.90)` - Declare how confident the AI is
-- Compiler warns when confidence < 0.80
-- Helps humans focus review efforts
+## Repository map
 
-### 2. Incremental Stages
-- `@stub` - Not implemented, returns error
-- `@partial` - Works for subset of inputs
-- `@complete` - Full implementation with verification
+| Area | Source | Role |
+| --- | --- | --- |
+| Compiler CLI | [src/cli.ts](src/cli.ts) | Compile, watch, and version commands |
+| Lexing and parsing | [src/parser/](src/parser/) | Tokenization, AST construction, and an enhanced-parser experiment |
+| TypeScript generation | [src/generator/](src/generator/) | Generated code and source-map support |
+| Runtime | [src/runtime/](src/runtime/) | Result helpers, confidence tracking, and agent experiments |
+| Verification experiments | [src/verification/](src/verification/), [src/lean4/](src/lean4/) | Z3 integration and Lean export source |
+| Language tooling | [src/lsp/](src/lsp/), [vscode-extension/](vscode-extension/) | Language-server and editor-extension source |
+| Further experiments | [src/effects/](src/effects/), [src/refinements/](src/refinements/), [src/property-tests/](src/property-tests/) | Effects, refinement types, and generated-test exploration |
 
-### 3. Context Requirements
-- `@needs(database, logger)` - Explicit dependencies
-- Compiler checks availability at call sites
-- No more "where did this variable come from?"
-
-### 4. Rich Errors
-- Errors include suggestions and recovery steps
-- Structured data, not strings
-- AI agents can programmatically fix errors
-
-### 5. Property-Based Testing
-- Properties auto-extracted from code
-- 1000 random test cases per function
-- Shrinking to minimal failing case
-
-### 6. Self-Healing Runtime
-- Health checks with auto-recovery
-- Escalates to human only when needed
-- Full audit trail
-
-## Architecture
-
-```
-.agentic file  →  [Parser]  →  AST  →  [Transformer]  →  TypeScript AST  →  .ts file
-                                                                ↓
-                                                         Runtime Library
-                                                         (confidence, health checks)
-```
-
-## Project Structure
-
-```
-agentic-lang/
-├── src/
-│   ├── parser/         # Tree-sitter based parser
-│   ├── transformer/    # AST → TypeScript transformation
-│   ├── generator/      # Code generation + source maps
-│   ├── runtime/        # Runtime library (@confidence, @needs, etc.)
-│   ├── property-tests/ # Auto-generate property tests
-│   └── cli.ts          # CLI entry point
-├── examples/           # Example .agentic files
-├── vscode-extension/   # VSCode extension for syntax highlighting
-└── docs/               # Documentation
-
-```
-
-## Building from Source
-
-```bash
-# Install dependencies
-npm install
-
-# Build transpiler
-npm run build
-
-# Run tests
-npm test
-
-# Development mode
-npm run dev -- compile examples/auth.agentic
-```
-
-## VSCode Extension
-
-Syntax highlighting and IntelliSense support included:
-
-```bash
-cd vscode-extension
-npm install
-npm run compile
-# Press F5 to test in Extension Development Host
-```
+The separate [src/wasm/](src/wasm/) Rust experiment is outside the root TypeScript build configuration.
 
 ## Documentation
 
-- [Language Specification](docs/SPECIFICATION.md) - Full language reference
-- [Type System](docs/TYPE_SYSTEM.md) - Context tracking and verification
-- [Runtime Library](docs/RUNTIME.md) - Built-in functions and decorators
-- [Examples](examples/) - Real-world code samples
+- [Quick start](docs/QUICK_START.md)
+- [Language specification](docs/SPECIFICATION.md)
+- [Tutorials](docs/tutorials/)
+- [Cookbook](docs/cookbook/README.md)
+- [Research references](docs/RESEARCH.md)
+- [Runtime source](src/runtime/index.ts)
 
-## Design Philosophy
+For the VS Code extension's declared compile workflow, see its [README](vscode-extension/README.md) and [package manifest](vscode-extension/package.json).
 
-1. **Embrace uncertainty** - AI agents are probabilistic
-2. **Incremental correctness** - Valid at every stage
-3. **Context is explicit** - Dependencies declared upfront
-4. **Verification by default** - Property tests auto-generate
-5. **Self-healing** - Auto-recover from failures
+## Prototype status
 
-## Research Backing
+This is an experimental implementation with parallel compiler/tooling paths. Formal verification, self-healing, complete context checking, and automatic property testing should be treated as design and implementation experiments rather than release guarantees. The source CLI currently returns an empty diagnostic list, and generated files import `./runtime`; consumers need to review and provide the matching runtime layout before executing generated code.
 
-Based on comprehensive research across:
-- Probabilistic programming (Pyro, RxInfer.jl)
-- Gradual typing (TypeScript, Rust)
-- Effect systems (Koka, Scala)
-- Property-based testing (Hypothesis, fast-check)
-- Self-healing systems (Kubernetes)
-
-See [RESEARCH.md](docs/RESEARCH.md) for full references.
-
-## Roadmap
-
-- [x] Phase 1: TypeScript transpiler MVP
-- [ ] Phase 2: VSCode extension with IntelliSense
-- [ ] Phase 3: Native compiler (Rust → LLVM)
-- [ ] Phase 4: Self-healing runtime
-- [ ] Phase 5: Collaborative IDE features
-
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
+A reproducible end-to-end example, supported grammar matrix, and recorded build/test results are useful next milestones. No benchmark numbers or working deployment are claimed here.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
-
----
-
-**Status:** MVP / Proof of Concept
-**Version:** 0.1.0
-**Last Updated:** January 2026
+The repository includes the [MIT License](LICENSE). Preserve its copyright and permission notice when reusing the source.
