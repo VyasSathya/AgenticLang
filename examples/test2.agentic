@@ -1,0 +1,4 @@
+@confidence(0.95)
+func divide(a: number, b: number) -> number {
+  return a / b
+}

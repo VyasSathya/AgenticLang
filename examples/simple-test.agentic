@@ -1,0 +1,4 @@
+// Simple test
+func test(x: number) -> number {
+  return x
+}

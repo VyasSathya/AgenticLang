@@ -1,0 +1,134 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Agentic",
+  "scopeName": "source.agentic",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.agentic",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.agentic",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "meta.annotation.agentic",
+          "match": "@(confidence|needs|uncertain|context|reasoning|property|stub|partial|complete|healthcheck|recovery|approval_required|cost|consequences)\\b",
+          "captures": {
+            "1": {
+              "name": "storage.modifier.annotation.agentic"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.agentic",
+          "match": "\\b(if|else|match|return|or|error)\\b"
+        },
+        {
+          "name": "keyword.other.agentic",
+          "match": "\\b(func)\\b"
+        },
+        {
+          "name": "constant.language.agentic",
+          "match": "\\b(true|false|null)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.agentic",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.agentic",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.agentic",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "meta.function.agentic",
+          "match": "\\b(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "captures": {
+            "1": {
+              "name": "keyword.other.agentic"
+            },
+            "2": {
+              "name": "entity.name.function.agentic"
+            }
+          }
+        },
+        {
+          "name": "entity.name.function.call.agentic",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\("
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.agentic",
+          "match": "\\b(string|number|boolean|void|Result|Ok|Err)\\b"
+        },
+        {
+          "name": "entity.name.type.agentic",
+          "match": "\\b([A-Z][a-zA-Z0-9_]*)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.agentic",
+          "match": "(->|=>|\\||==|!=|<=|>=|<|>)"
+        },
+        {
+          "name": "keyword.operator.assignment.agentic",
+          "match": "="
+        }
+      ]
+    }
+  }
+}

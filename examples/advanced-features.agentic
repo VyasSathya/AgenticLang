@@ -1,0 +1,98 @@
+// Advanced Agentic Language Features Demo
+// This example showcases all the powerful features of Agentic
+
+// Example 1: Match expressions with Result types
+@confidence(0.95, "Well-tested pattern matching")
+@complete
+funcprocessResult(value: number) -> Result<string, string> {
+  validateInput(value) match {
+    Ok(v) -> return Ok("Success: " + v),
+    Err(e) -> return Err("Failed: " + e)
+  }
+}
+
+// Example 2: Error recovery with context
+@confidence(0.85, "Has fallback mechanism")
+@partial
+funcfetchDataWithRecovery(url: string) -> Result<string, string> {
+  httpGet(url) or error {
+    @context {
+      what_failed: "HTTP GET request",
+      likely_cause: "Network timeout or invalid URL",
+      recovery: "Trying cached data"
+    }
+    return getCachedData(url)
+  }
+}
+
+// Example 3: Stub function (not implemented yet)
+@stub
+@needs(database, auth_token)
+funccreateUserAccount(username: string, email: string) -> Result<User, Error> {
+  // This will throw "not yet implemented" error
+}
+
+// Example 4: Uncertain areas marked
+@confidence(0.70, "Algorithm needs validation")
+@uncertain("edge cases", "performance impact")
+@partial
+funccomplexCalculation(data: number[]) -> Result<number, string> {
+  if data.length == 0 {
+    return Err("Empty data")
+  }
+
+  // Complex logic here...
+  return Ok(42)
+}
+
+// Example 5: Confidence-based fallback chain
+@confidence(0.90, "Multiple fallbacks ensure success")
+@complete
+funcrobustOperation(input: string) -> Result<string, string> {
+  primaryMethod(input) match {
+    Ok(result) -> return Ok(result),
+    Err(e) -> {
+      secondaryMethod(input) match {
+        Ok(result) -> return Ok(result),
+        Err(e2) -> return fallbackMethod(input)
+      }
+    }
+  }
+}
+
+// Example 6: Stage-aware development
+@partial
+@confidence(0.60, "Basic features only")
+funcaiModelInference(prompt: string) -> Result<string, string> {
+  // TODO: Add temperature control
+  // TODO: Add token limits
+  // TODO: Add streaming support
+  return Ok("Basic response")
+}
+
+// Example 7: Context validation
+@needs(api_key, model_name, temperature)
+@confidence(0.95, "Production-ready")
+@complete
+funcconfigureModel(config: Config) -> Result<Model, string> {
+  if !config.api_key {
+    return Err("Missing API key")
+  }
+
+  return Ok(createModel(config))
+}
+
+// Example 8: Nested match expressions
+@confidence(0.88, "Handles most cases")
+@complete
+funcprocessNestedResults(x: Result<number, string>) -> string {
+  x match {
+    Ok(value) -> {
+      doubleValue(value) match {
+        Ok(doubled) -> return "Doubled: " + doubled,
+        Err(e) -> return "Failed to double: " + e
+      }
+    },
+    Err(e) -> return "Initial error: " + e
+  }
+}

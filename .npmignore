@@ -1,0 +1,75 @@
+# Source files (publish compiled only)
+src/
+tsconfig.json
+tsconfig.lsp.json
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
+vitest.config.ts
+
+# Documentation source (keep markdown in published package)
+website/
+docs/
+
+# Examples (keep .agentic files)
+# examples/ - INCLUDE these!
+
+# Development files
+.github/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and temp
+*.log
+tmp/
+temp/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vibebot/
+.vibetasks/
+.claude/
+
+# Build artifacts we don't need
+coverage/
+reports/
+.stryker-tmp/
+benchmarks/
+
+# Config files for development only
+.eslintrc*
+.prettierrc*
+stryker.conf.json
+
+# Deployment configs
+netlify.toml
+vercel.json
+
+# Large documentation files
+COMPREHENSIVE_BUILD_REPORT.md
+IMPLEMENTATION_SUMMARY.md
+FINAL_STATUS_REPORT.md
+COMPLETE_VICTORY.md
+ULTIMATE_ACHIEVEMENT.md
+MASTER_SUMMARY.md
+ACHIEVEMENT_REPORT.md
+
+# Keep these for npm:
+# - README.md
+# - README_ENHANCED.md
+# - LICENSE
+# - ROADMAP.md
+# - COMMUNITY.md
+# - CONTRIBUTING.md
+# - examples/
+# - dist/
+# - bin/
+# - stdlib/

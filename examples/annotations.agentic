@@ -1,0 +1,37 @@
+// Example: Annotation system demonstration
+// Shows different annotation types and their purposes
+
+@confidence(0.99, "Core functionality")
+@complete
+funcprocessData(data: string) -> Result<string, string> {
+  if !data {
+    return Err("Empty data")
+  }
+  return Ok(data)
+}
+
+@stub
+@needs(database_connection, auth_token)
+funcsaveToDatabase(data: string) -> Result<boolean, string> {
+  // Not yet implemented
+}
+
+@partial
+@confidence(0.60, "Basic features only")
+@uncertain("error handling", "edge cases")
+funcexperimentalFeature(input: number) -> Result<number, string> {
+  // Partially implemented
+  if input < 0 {
+    return Err("Negative input")
+  }
+  return Ok(input * 2)
+}
+
+@complete
+@confidence(0.88, "Production tested")
+funcrobustOperation(value: string) -> Result<string, string> {
+  processData(value) match {
+    Ok(result) -> return Ok(result),
+    Err(e) -> return Err("Failed: " + e)
+  }
+}

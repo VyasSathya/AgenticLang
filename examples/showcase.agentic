@@ -1,0 +1,22 @@
+// Agentic Language Showcase
+// Demonstrates key features
+
+@confidence(0.95)
+@complete
+func divide(a: number, b: number) -> number {
+  if b == 0 {
+    return 0
+  }
+  return a / b
+}
+
+@stub
+func notImplemented() -> number {
+  return 42
+}
+
+@partial
+@confidence(0.70)
+func experimental(x: number) -> number {
+  return x * 2
+}

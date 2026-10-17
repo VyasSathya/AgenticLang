@@ -1,0 +1,53 @@
+// Example: Authentication with confidence tracking
+// This demonstrates Agentic language features
+
+@confidence(0.90)
+@needs(database: Database, jwt_secret: string)
+func authenticate(token: string) -> Result<User, AuthError> {
+    // Validate input with high confidence
+    @confident(0.99)
+    if token.isEmpty() {
+        return Err(AuthError.MISSING_TOKEN)
+    }
+
+    // Decode token with uncertainty
+    @uncertain("Edge case: malformed but decodable tokens?")
+    decoded = jwt.decode(token, jwt_secret) match {
+        Ok(payload) -> payload,
+        Err(e) -> {
+            @context {
+                what_failed: "JWT decode",
+                token_preview: token[0..20],
+                error: e.message,
+                suggestions: [
+                    "Check if token is properly base64 encoded",
+                    "Verify JWT_SECRET matches token issuer"
+                ]
+            }
+            return Err(AuthError.INVALID_TOKEN)
+        }
+    }
+
+    // Check expiration
+    @reasoning {
+        "Expired tokens must be rejected even if signature is valid"
+        "This prevents replay attacks"
+    }
+    if decoded.exp < now() {
+        return Err(AuthError.EXPIRED)
+    }
+
+    // Load user
+    user = database.users.find(decoded.user_id) or {
+        @anomaly("Token valid but user doesn't exist - possible account deletion")
+        return Err(AuthError.USER_NOT_FOUND)
+    }
+
+    return Ok(user)
+}
+
+// Property-based tests auto-generated:
+@property("rejects empty tokens")
+@property("rejects expired tokens")
+@property("accepts valid tokens")
+@property("fails gracefully on invalid format")
